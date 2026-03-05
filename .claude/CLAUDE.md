@@ -1,6 +1,7 @@
 # Ctrl + Alt + Defend
 
 ## What This Is
+
 A multiplayer mobile browser-based castle defence game built for a career talk event. 3 players per team, each on their own device, defending a castle together in real time using verbal communication only.
 
 Full game design spec: `docs/game-spec.md`
@@ -8,12 +9,14 @@ Game config (all tunable values): `src/config/gameConfig.ts`
 Supabase schema: `docs/schema.sql`
 
 ## Stack
-- **Frontend:** Next.js (App Router)
+
+- **Frontend:** Next.js (App Router) + shadcn components
 - **Backend:** Supabase (Postgres + Realtime)
 - **Styling:** Tailwind CSS
 - **Language:** TypeScript throughout — strict mode, no `any`
 
 ## Key Architectural Decisions
+
 - Game engine runs **client-side** — compute on player devices
 - Supabase Realtime used as event bus — player actions insert rows into `game_events`, all players in a room subscribe and update local UI reactively
 - No auth — teams join via room code only
@@ -21,6 +24,7 @@ Supabase schema: `docs/schema.sql`
 - All game values (costs, timers, HP, damage, wave config) live in `gameConfig.ts` — no magic numbers in game logic
 
 ## Project Structure
+
 ```
 .claude/
   CLAUDE.md
@@ -29,6 +33,9 @@ Supabase schema: `docs/schema.sql`
     schema.sql          # Supabase schema
 .mcp.json               # MCP config — root level
 frontend/               # Next.js app
+  _shadcn/
+    components/
+      ui/
   app/
     page.tsx                          # Landing — enter team name, room code, pick role
     lobby/[roomCode]/page.tsx         # Waiting room
@@ -55,13 +62,17 @@ frontend/               # Next.js app
 ```
 
 ## Coding Conventions
+
 - Use `gameConfig.ts` for all numeric values — never hardcode game constants
 - Game state is local — synced via Supabase Realtime events, not server-computed
 - Keep game engine logic in `src/engine/` — completely separate from UI components
 - All Supabase interactions go through `src/lib/`
+- Always use shadcn components, if the component does not exist install and use it
+- More complex components can be standalone but must use shadcn components wherever possible
 - Mobile-first — all screens must be usable on a phone
 
 ## Commands
+
 ```bash
 cd frontend
 npm run dev       # Start dev server
