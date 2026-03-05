@@ -10,7 +10,7 @@ Supabase schema: `docs/schema.sql`
 
 ## Stack
 
-- **Frontend:** Next.js (App Router) + shadcn components
+- **Frontend:** Next.js (App Router) + shadcn components + TanStackQuery for fetching and mutating data
 - **Backend:** Supabase (Postgres + Realtime)
 - **Styling:** Tailwind CSS
 - **Language:** TypeScript throughout — strict mode, no `any`
