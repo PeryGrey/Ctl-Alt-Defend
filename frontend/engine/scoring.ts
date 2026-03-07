@@ -1,8 +1,8 @@
 import { GAME_CONFIG } from '../config/gameConfig'
-import type { GameState, Wall, WallId } from './types'
+import type { GameState, Lane, LaneId } from './types'
 
-export function getWallsAlive(walls: Record<WallId, Wall>): number {
-  return Object.values(walls).filter((w) => w.hp > 0).length
+export function getLanesAlive(lanes: Record<LaneId, Lane>): number {
+  return Object.values(lanes).filter((l) => l.hp > 0).length
 }
 
 export function calculateScore(state: GameState): number {
@@ -10,7 +10,7 @@ export function calculateScore(state: GameState): number {
   return (
     state.wavesCompleted * scoring.perWaveSurvived +
     state.totalEnemiesDefeated * scoring.perEnemyDefeated +
-    getWallsAlive(state.walls) * scoring.perWallAlive -
+    getLanesAlive(state.lanes) * scoring.perLaneAlive -
     state.weaponsDestroyed * scoring.penaltyPerWeaponDestroyed -
     state.narrowBreaches * scoring.penaltyPerNarrowBreach
   )

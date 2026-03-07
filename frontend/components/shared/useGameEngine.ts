@@ -2,7 +2,7 @@
 import { useEffect, useState, useRef, useCallback } from 'react'
 import { createGameEngine } from '@/engine/gameEngine'
 import { publishEvent } from '@/lib/realtime'
-import type { GameState, Role, WallId, AmmoType } from '@/engine/types'
+import type { GameState, Role, LaneId, AmmoType } from '@/engine/types'
 import type { GameEngine } from '@/engine/gameEngine'
 
 export function useGameEngine(roomCode: string, role: Role) {
@@ -24,14 +24,12 @@ export function useGameEngine(roomCode: string, role: Role) {
     }
   }, [roomCode, role])
 
-  // Stable action wrappers — ref.current is accessed when called (event handlers),
-  // not during render, satisfying react-hooks/refs.
-  const startBuild = useCallback((wallId: WallId, slot: 0 | 1) => {
-    engineRef.current?.actions.startBuild(wallId, slot)
+  const startBuild = useCallback((laneId: LaneId, slot: 0) => {
+    engineRef.current?.actions.startBuild(laneId, slot)
   }, [])
 
-  const reinforce = useCallback((wallId: WallId) => {
-    engineRef.current?.actions.reinforce(wallId)
+  const reinforce = useCallback((laneId: LaneId) => {
+    engineRef.current?.actions.reinforce(laneId)
   }, [])
 
   const assignPersonnel = useCallback(

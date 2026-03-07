@@ -5,8 +5,8 @@ export type GameEventType =
   | 'player_join'
   | 'brew_start' | 'brew_complete' | 'ammo_dispatch'
   | 'build_start' | 'build_complete' | 'upgrade' | 'reposition' | 'reinforce'
-  | 'weapon_fire' | 'weapon_assign' | 'weapon_repair'
-  | 'enemy_spawn' | 'enemy_defeated' | 'wall_damage' | 'wave_start' | 'wave_end'
+  | 'weapon_fire' | 'weapon_assign' | 'weapon_repair' | 'weapon_durability'
+  | 'enemy_spawn' | 'enemy_defeated' | 'lane_damage' | 'wave_start' | 'wave_end'
   | 'game_over'
 
 export interface GameEvent {
@@ -63,6 +63,17 @@ export async function publishEvent(
     .insert({ room_code: roomCode, type, payload })
 
   if (error) throw error
+}
+
+/** Fetch all historical game_events for a room in ascending order. */
+export async function fetchRoomEvents(roomCode: string): Promise<GameEvent[]> {
+  const { data, error } = await supabase
+    .from('game_events')
+    .select('id, type, payload, created_at')
+    .eq('room_code', roomCode)
+    .order('created_at', { ascending: true })
+  if (error) throw error
+  return data ?? []
 }
 
 /** Subscribe to game_sessions updates for a room. Returns unsubscribe fn. */

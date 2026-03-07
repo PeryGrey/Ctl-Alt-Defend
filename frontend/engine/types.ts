@@ -1,4 +1,4 @@
-export type WallId = 'north' | 'south' | 'east' | 'west'
+export type LaneId = 'moat_left' | 'bridge_left' | 'bridge_right' | 'moat_right'
 export type EnemyType = 'sea' | 'land' | 'air' // sea→cannonballs, land→arrows, air→bolts
 export type AmmoType = 'cannonballs' | 'arrows' | 'bolts'
 export type Role = 'builder' | 'artillery' | 'alchemist'
@@ -7,28 +7,28 @@ export type GamePhase = 'wave_active' | 'between_waves' | 'game_over'
 export interface Enemy {
   id: string
   type: EnemyType
-  targetWall: WallId
+  targetLane: LaneId
   hp: number
   maxHp: number
   speed: number // px/sec from config
-  position: number // 0–100 progress toward wall (100 = reached)
+  position: number // 0–100 progress toward castle (100 = reached)
   alive: boolean
 }
 
 export interface Weapon {
   id: string
-  wallId: WallId
-  slot: 0 | 1
+  laneId: LaneId
+  slot: 0
   durability: number // 0 = destroyed
   ammoLoaded: AmmoType | null
   exists: boolean
 }
 
-export interface Wall {
-  id: WallId
+export interface Lane {
+  id: LaneId
   hp: number
   maxHp: number
-  weapons: [Weapon | null, Weapon | null]
+  weapons: [Weapon | null]
 }
 
 export interface Personnel {
@@ -45,8 +45,8 @@ export interface BrewSlot {
 
 export interface BuilderAction {
   type: 'build' | 'upgrade' | 'reposition' | 'reinforce' | 'emergencyRebuild'
-  wallId: WallId
-  slot: 0 | 1 | undefined
+  laneId: LaneId
+  slot: 0 | undefined
   completesAt: number // ms timestamp
 }
 
@@ -60,7 +60,7 @@ export interface GameState {
   nextWaveAt: number | null // ms timestamp (set during breather)
 
   resources: number // Builder resource pool
-  walls: Record<WallId, Wall>
+  lanes: Record<LaneId, Lane>
   enemies: Enemy[]
   enemiesDefeated: number // this wave
   totalEnemiesDefeated: number // all time
@@ -74,7 +74,7 @@ export interface GameState {
   score: number
   wavesCompleted: number
   weaponsDestroyed: number
-  narrowBreaches: number // walls that reached <10 HP but survived
+  narrowBreaches: number // lanes that reached <10 HP but survived
 
   radarAccuracy: number // 0–100
   correctAmmoKills: number

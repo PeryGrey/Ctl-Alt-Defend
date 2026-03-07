@@ -124,3 +124,9 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Fix Tailwind animate-ping on SVG elements */
+.radar-ping {
+  transform-box: fill-box;
+  transform-origin: center;
+}

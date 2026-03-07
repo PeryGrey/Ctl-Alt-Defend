@@ -1,25 +1,47 @@
-'use client'
-import { Card, CardContent } from '@/_shadcn/components/ui/card'
-import { Button } from '@/_shadcn/components/ui/button'
-import { Badge } from '@/_shadcn/components/ui/badge'
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/_shadcn/components/ui/select'
-import type { Personnel, Weapon } from '@/engine/types'
+"use client";
+import { Card, CardContent } from "@/_shadcn/components/ui/card";
+import { Button } from "@/_shadcn/components/ui/button";
+import { Badge } from "@/_shadcn/components/ui/badge";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/_shadcn/components/ui/select";
+import type { Personnel, Weapon } from "@/engine/types";
 
 interface PersonnelPoolProps {
-  personnel: Personnel[]
-  weapons: Weapon[]
-  onAssign: (id: 0 | 1 | 2, weaponId: string, mode: 'firing' | 'maintaining') => void
-  onUnassign: (id: 0 | 1 | 2) => void
+  personnel: Personnel[];
+  weapons: Weapon[];
+  onAssign: (
+    id: 0 | 1 | 2,
+    weaponId: string,
+    mode: "firing" | "maintaining",
+  ) => void;
+  onUnassign: (id: 0 | 1 | 2) => void;
 }
 
-const MODE_LABELS: Record<Personnel['mode'], string> = {
-  idle: 'Idle',
-  firing: 'Firing',
-  maintaining: 'Maintaining',
-}
+const MODE_LABELS: Record<Personnel["mode"], string> = {
+  idle: "Idle",
+  firing: "Firing",
+  maintaining: "Maintaining",
+};
 
-export function PersonnelPool({ personnel, weapons, onAssign, onUnassign }: PersonnelPoolProps) {
-  const idleWeapons = weapons.filter((w) => w.exists)
+const LANE_SHORT: Record<string, string> = {
+  moat_left: "Moat L",
+  bridge_left: "Bridge L",
+  bridge_right: "Bridge R",
+  moat_right: "Moat R",
+};
+
+export function PersonnelPool({
+  personnel,
+  weapons,
+  onAssign,
+  onUnassign,
+}: PersonnelPoolProps) {
+  const activeWeapons = weapons.filter((w) => w.exists);
 
   return (
     <div className="space-y-2">
@@ -30,14 +52,16 @@ export function PersonnelPool({ personnel, weapons, onAssign, onUnassign }: Pers
         <Card key={person.id}>
           <CardContent className="py-3 px-3 space-y-2">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-sm">Soldier {person.id + 1}</span>
+              <span className="font-semibold text-sm">
+                Soldier {person.id + 1}
+              </span>
               <Badge
                 variant={
-                  person.mode === 'firing'
-                    ? 'default'
-                    : person.mode === 'maintaining'
-                    ? 'secondary'
-                    : 'outline'
+                  person.mode === "firing"
+                    ? "default"
+                    : person.mode === "maintaining"
+                    ? "secondary"
+                    : "outline"
                 }
               >
                 {MODE_LABELS[person.mode]}
@@ -47,22 +71,29 @@ export function PersonnelPool({ personnel, weapons, onAssign, onUnassign }: Pers
             {person.weaponId ? (
               <div className="space-y-2">
                 <p className="text-xs text-muted-foreground">
-                  Weapon: <span className="font-mono">{person.weaponId.slice(-4)}</span>
+                  Weapon:{" "}
+                  <span className="font-mono">{person.weaponId.slice(-4)}</span>
                 </p>
                 <div className="flex gap-2">
                   <Button
                     size="sm"
-                    variant={person.mode === 'firing' ? 'default' : 'outline'}
+                    variant={person.mode === "firing" ? "default" : "outline"}
                     className="flex-1 h-9"
-                    onClick={() => onAssign(person.id, person.weaponId!, 'firing')}
+                    onClick={() =>
+                      onAssign(person.id, person.weaponId!, "firing")
+                    }
                   >
                     Fire
                   </Button>
                   <Button
                     size="sm"
-                    variant={person.mode === 'maintaining' ? 'default' : 'outline'}
+                    variant={
+                      person.mode === "maintaining" ? "default" : "outline"
+                    }
                     className="flex-1 h-9"
-                    onClick={() => onAssign(person.id, person.weaponId!, 'maintaining')}
+                    onClick={() =>
+                      onAssign(person.id, person.weaponId!, "maintaining")
+                    }
                   >
                     Maintain
                   </Button>
@@ -78,20 +109,23 @@ export function PersonnelPool({ personnel, weapons, onAssign, onUnassign }: Pers
               </div>
             ) : (
               <Select
-                onValueChange={(weaponId) => onAssign(person.id, weaponId, 'firing')}
+                onValueChange={(weaponId) =>
+                  onAssign(person.id, weaponId, "firing")
+                }
               >
                 <SelectTrigger className="h-9">
                   <SelectValue placeholder="Assign to weapon…" />
                 </SelectTrigger>
                 <SelectContent>
-                  {idleWeapons.length === 0 && (
+                  {activeWeapons.length === 0 && (
                     <SelectItem value="__none" disabled>
                       No weapons available
                     </SelectItem>
                   )}
-                  {idleWeapons.map((w) => (
+                  {activeWeapons.map((w) => (
                     <SelectItem key={w.id} value={w.id}>
-                      {w.wallId} slot {w.slot + 1} · {w.id.slice(-4)}
+                      {LANE_SHORT[w.laneId] ?? w.laneId} slot {w.slot + 1} ·{" "}
+                      {w.id.slice(-4)}
                     </SelectItem>
                   ))}
                 </SelectContent>
@@ -101,5 +135,5 @@ export function PersonnelPool({ personnel, weapons, onAssign, onUnassign }: Pers
         </Card>
       ))}
     </div>
-  )
+  );
 }

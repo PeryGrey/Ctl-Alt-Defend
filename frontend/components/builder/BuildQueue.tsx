@@ -16,6 +16,13 @@ const ACTION_LABELS: Record<BuilderAction['type'], string> = {
   emergencyRebuild: 'Emergency Rebuild',
 }
 
+const LANE_LABELS: Record<string, string> = {
+  moat_left: 'Left Moat',
+  bridge_left: 'Left Bridge',
+  bridge_right: 'Right Bridge',
+  moat_right: 'Right Moat',
+}
+
 function Countdown({ completesAt }: { completesAt: number }) {
   const [secs, setSecs] = useState(() => Math.max(0, Math.ceil((completesAt - Date.now()) / 1000)))
 
@@ -39,12 +46,15 @@ export function BuildQueue({ actions }: BuildQueueProps) {
           Build Queue
         </p>
         {actions.map((a) => (
-          <div key={`${a.wallId}-${a.slot ?? 'r'}-${a.completesAt}`} className="flex items-center justify-between text-sm">
+          <div
+            key={`${a.laneId}-${a.slot ?? 'r'}-${a.completesAt}`}
+            className="flex items-center justify-between text-sm"
+          >
             <span>
               {ACTION_LABELS[a.type]}{' '}
-              <span className="capitalize text-muted-foreground">{a.wallId}</span>
+              <span className="text-muted-foreground">{LANE_LABELS[a.laneId] ?? a.laneId}</span>
               {a.slot !== undefined && (
-                <span className="text-muted-foreground"> slot {a.slot + 1}</span>
+                <span className="text-muted-foreground"> weapon</span>
               )}
             </span>
             <Badge variant="secondary">

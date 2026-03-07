@@ -25,10 +25,10 @@ export const GAME_CONFIG = {
     },
   },
 
-  // ── WALLS ──────────────────────────────────────────────────────────────────
-  walls: {
+  // ── LANES ──────────────────────────────────────────────────────────────────
+  lanes: {
     startingHp: 100,
-    slotsPerWall: 2, // number of weapon slots per wall
+    slotsPerLane: 1, // number of weapon slots per lane
   },
 
   // ── WEAPONS ────────────────────────────────────────────────────────────────
@@ -59,6 +59,8 @@ export const GAME_CONFIG = {
     baseHp: 50,
     baseDamagePerHit: 10, // damage dealt to wall per hit
     baseSpeedPxPerSecond: 30,
+    spawnStaggerMin: 10, // min position units between consecutive enemies in the same lane
+    spawnStaggerMax: 20, // max position units between consecutive enemies in the same lane
   },
 
   // ── WAVES ──────────────────────────────────────────────────────────────────
@@ -67,49 +69,49 @@ export const GAME_CONFIG = {
     {
       wave: 1,
       enemyCount: 5,
-      attackWalls: 1,
+      attackLanes: 1,
       speedMultiplier: 1.0,
       hpMultiplier: 1.0,
     },
     {
       wave: 2,
       enemyCount: 8,
-      attackWalls: 2,
+      attackLanes: 2,
       speedMultiplier: 1.0,
       hpMultiplier: 1.5,
     },
     {
       wave: 3,
       enemyCount: 12,
-      attackWalls: 2,
+      attackLanes: 2,
       speedMultiplier: 1.5,
       hpMultiplier: 2.0,
     },
     {
       wave: 4,
       enemyCount: 16,
-      attackWalls: 3,
+      attackLanes: 3,
       speedMultiplier: 1.5,
       hpMultiplier: 2.5,
     },
     {
       wave: 5,
       enemyCount: 20,
-      attackWalls: 3,
+      attackLanes: 3,
       speedMultiplier: 2.0,
       hpMultiplier: 3.0,
     },
     {
       wave: 6,
       enemyCount: 25,
-      attackWalls: 4,
+      attackLanes: 4,
       speedMultiplier: 2.0,
       hpMultiplier: 3.5,
     },
     {
       wave: 7,
       enemyCount: 30,
-      attackWalls: 4,
+      attackLanes: 4,
       speedMultiplier: 2.5,
       hpMultiplier: 4.0,
     },
@@ -119,7 +121,7 @@ export const GAME_CONFIG = {
   scoring: {
     perWaveSurvived: 100,
     perEnemyDefeated: 10,
-    perWallAlive: 50,
+    perLaneAlive: 50,
     penaltyPerWeaponDestroyed: 20,
     penaltyPerNarrowBreach: 5,
   },
