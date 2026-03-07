@@ -7,7 +7,9 @@ create table game_sessions (
   current_wave int default 1,
   score int default 0,
   waves_survived int default 0,
-  created_at timestamp default now()
+  game_state jsonb default null, -- periodic snapshot for reconnection
+  created_at timestamp default now(),
+  updated_at timestamp default now()
 );
 
 -- Real-time game events (event bus between players)
@@ -18,7 +20,7 @@ create table game_events (
   -- 'brew_start' | 'brew_complete' | 'ammo_dispatch'
   -- 'build_start' | 'build_complete' | 'upgrade' | 'reposition' | 'reinforce'
   -- 'weapon_fire' | 'weapon_assign' | 'weapon_repair'
-  -- 'enemy_spawn' | 'enemy_defeated' | 'wall_damage' | 'wave_start' | 'wave_end'
+  -- 'enemy_spawn' | 'enemy_defeated' | 'lane_damage' | 'wave_start' | 'wave_end'
   -- 'game_over'
   payload jsonb,
   created_at timestamp default now()
@@ -30,6 +32,19 @@ create view leaderboard as
   from game_sessions
   where status = 'complete'
   order by score desc, waves_survived desc;
+
+-- Auto-update updated_at on game_sessions
+create or replace function update_updated_at()
+returns trigger as $$
+begin
+  new.updated_at = now();
+  return new;
+end;
+$$ language plpgsql;
+
+create trigger game_sessions_updated_at
+  before update on game_sessions
+  for each row execute function update_updated_at();
 
 -- Indexes for performance
 create index game_events_room_code_idx on game_events (room_code);
