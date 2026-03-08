@@ -60,7 +60,7 @@ export const GAME_CONFIG = {
   enemies: {
     baseHp: 50,
     baseDamagePerHit: 10, // damage dealt to wall per hit
-    baseSpeedPxPerSecond: 30,
+    baseSpeedPxPerSecond: 150,
     spawnStaggerMin: 10, // min position units between consecutive enemies in the same lane
     spawnStaggerMax: 20, // max position units between consecutive enemies in the same lane
   },
