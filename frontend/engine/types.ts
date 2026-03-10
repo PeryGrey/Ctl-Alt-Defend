@@ -1,7 +1,7 @@
 export type LaneId = 'moat_left' | 'bridge_left' | 'bridge_right' | 'moat_right'
 export const LANE_IDS: LaneId[] = ['moat_left', 'bridge_left', 'bridge_right', 'moat_right']
-export type EnemyType = 'sea' | 'land' | 'air' // sea→cannonballs, land→arrows, air→bolts
-export type AmmoType = 'cannonballs' | 'arrows' | 'bolts'
+export type EnemyType = 'sea' | 'land' | 'air'
+export type AmmoType = 'sea' | 'land' | 'air'
 export type Role = 'builder' | 'artillery' | 'alchemist'
 export type GamePhase = 'wave_active' | 'between_waves' | 'game_over'
 

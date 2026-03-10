@@ -1,39 +1,32 @@
 "use client";
 import { StatRow } from "@/components/shared/StatRow";
+import { GAME_CONFIG } from "@/config/gameConfig";
+import type { Lane } from "@/engine/types";
 import { getHealthColorClass } from "@/lib/gameUtils";
-import { AMMO_ICONS } from "@/constants/gameLabels";
-import type { Lane, Personnel } from "@/engine/types";
 
 interface ArtilleryLaneInfoProps {
   lane: Lane;
-  personnel: [Personnel, Personnel, Personnel];
 }
 
-export function ArtilleryLaneInfo({ lane, personnel }: ArtilleryLaneInfoProps) {
-  const hpPct = (lane.hp / lane.maxHp) * 100;
+export function ArtilleryLaneInfo({ lane }: ArtilleryLaneInfoProps) {
   const weapon = lane.weapons[0];
   const weaponExists = weapon !== null && weapon?.exists;
-  const ammoShort =
-    weaponExists && weapon?.ammoLoaded
-      ? AMMO_ICONS[weapon.ammoLoaded]
-      : "—";
-  const assignedCount = weaponExists
-    ? personnel.filter((p) => p.weaponId === weapon?.id).length
+  const durPct = weaponExists
+    ? (weapon.durability / GAME_CONFIG.weapons.startingDurability) * 100
     : 0;
 
   return (
     <div className="w-full space-y-1.5">
-      <StatRow
-        label="Wall"
-        value={hpPct}
-        display={`${Math.ceil(lane.hp)}`}
-        barClass={getHealthColorClass(hpPct)}
-      />
-      {/* Weapon status */}
-      <div className="flex items-center justify-between text-xs text-muted-foreground">
-        <span>{ammoShort}</span>
-        <span>{weaponExists ? `×${assignedCount}` : "—"}</span>
-      </div>
+      {weaponExists ? (
+        <StatRow
+          label="Gun"
+          value={durPct ?? 0}
+          display={`${Math.ceil(weapon.durability)}`}
+          barClass={getHealthColorClass(durPct)}
+        />
+      ) : (
+        <div className="text-xs text-muted-foreground">No weapon</div>
+      )}
     </div>
   );
 }

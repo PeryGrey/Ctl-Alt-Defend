@@ -63,7 +63,7 @@ function initialState(roomCode: string, role: Role): GameState {
     enemiesDefeated: 0,
     totalEnemiesDefeated: 0,
     personnel: makeInitialPersonnel(),
-    ammoInventory: { cannonballs: 0, arrows: 0, bolts: 0 },
+    ammoInventory: { sea: 0, land: 0, air: 0 },
     brewSlots: makeInitialBrewSlots(),
     builderActions: [],
     score: 0,
@@ -75,13 +75,6 @@ function initialState(roomCode: string, role: Role): GameState {
   }
 }
 
-// ── Ammo→EnemyType mapping ───────────────────────────────────────────────────
-
-const CORRECT_AMMO: Record<string, AmmoType> = {
-  sea: 'cannonballs',
-  land: 'arrows',
-  air: 'bolts',
-}
 
 // ── Public interfaces ────────────────────────────────────────────────────────
 
@@ -158,7 +151,7 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
           enemy.alive = false
           state.enemiesDefeated++
           state.totalEnemiesDefeated++
-          if (ammoType && enemy && CORRECT_AMMO[enemy.type] === ammoType) {
+          if (ammoType && enemy && enemy.type === ammoType) {
             state.correctAmmoKills++
           }
           state.score = calculateScore(state)
@@ -277,7 +270,7 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
 
         // Reset all operational state — persists: lane HP, weapons, score, radar
         state.resources = GAME_CONFIG.builder.startingResources
-        state.ammoInventory = { cannonballs: 0, arrows: 0, bolts: 0 }
+        state.ammoInventory = { sea: 0, land: 0, air: 0 }
         state.brewSlots = makeInitialBrewSlots()
         state.builderActions = []
         state.personnel = makeInitialPersonnel()
@@ -441,7 +434,7 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
 
           if (!target) continue
 
-          const isCorrectAmmo = CORRECT_AMMO[target.type] === weapon.ammoLoaded
+          const isCorrectAmmo = target.type === weapon.ammoLoaded
           const damage =
             weapons.damagePerShot *
             (isCorrectAmmo ? 1 : GAME_CONFIG.artillery.wrongAmmoMultiplier)

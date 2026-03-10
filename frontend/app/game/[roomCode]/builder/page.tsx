@@ -7,7 +7,7 @@ import { PhaseBadge } from "@/components/shared/PhaseBadge";
 import { GameLoadingState } from "@/components/shared/GameLoadingState";
 import { GameScreenLayout } from "@/components/shared/GameScreenLayout";
 import { useGameOverRedirect } from "@/components/shared/useGameOverRedirect";
-import { ResourceMeter } from "@/components/builder/ResourceMeter";
+import { MetricMeter } from "@/components/shared/MetricMeter";
 import { CastleMap } from "@/components/builder/CastleMap";
 import { GAME_CONFIG } from "@/config/gameConfig";
 import { ROLE_META } from "@/constants/gameLabels";
@@ -46,8 +46,10 @@ export default function BuilderPage() {
           <div className="text-xs text-muted-foreground">
             Score: {state.score}
           </div>
-          <ResourceMeter
-            resources={state.resources}
+          <MetricMeter
+            label="Resource"
+            value={state.resources}
+            maxValue={GAME_CONFIG.builder.resourceCap}
             regenRate={GAME_CONFIG.builder.resourceRegenPerSecond}
           />
         </>

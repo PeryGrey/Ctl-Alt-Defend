@@ -4,15 +4,9 @@ import { Badge } from "@/_shadcn/components/ui/badge";
 import { LANE_LABELS } from "@/constants/gameLabels";
 import { BuilderLaneInfo } from "@/components/shared/BuilderLaneInfo";
 import { ArtilleryLaneInfo } from "@/components/shared/ArtilleryLaneInfo";
+import { ArtilleryStatusTags } from "@/components/shared/ArtilleryStatusTags";
 import { AlchemistLaneInfo } from "@/components/shared/AlchemistLaneInfo";
-import type {
-  Lane,
-  LaneId,
-  Enemy,
-  Personnel,
-  Role,
-  BuilderAction,
-} from "@/engine/types";
+import type { Lane, LaneId, Enemy, Personnel, Role } from "@/engine/types";
 import { LANE_IDS } from "@/engine/types";
 
 // ── Artillery track (right track panel) ──────────────────────────────────────
@@ -54,7 +48,6 @@ interface BattlefieldViewProps {
   selectedLaneId: LaneId | null;
   onSelectLane: (laneId: LaneId) => void;
   personnel?: [Personnel, Personnel, Personnel];
-  builderActions?: BuilderAction[];
 }
 
 export function BattlefieldView({
@@ -65,7 +58,6 @@ export function BattlefieldView({
   selectedLaneId,
   onSelectLane,
   personnel,
-  builderActions = [],
 }: BattlefieldViewProps) {
   return (
     <div className="h-full flex flex-col p-2 gap-2">
@@ -99,70 +91,63 @@ export function BattlefieldView({
           ).length;
 
           return (
-            <button
-              key={laneId}
-              onClick={() => onSelectLane(laneId)}
-              className={cn(
-                "flex flex-row items-stretch rounded-lg border-2 text-left transition-colors w-full flex-1 overflow-hidden p-0",
-                selected
-                  ? "border-primary bg-primary/10"
-                  : critical
-                  ? "border-destructive/60 bg-destructive/5"
-                  : "border-border bg-card hover:border-primary/40",
-              )}
-            >
-              {/* Left: info panel */}
-              <div className="shrink-0 w-[40%] flex flex-col justify-center p-2 gap-1.5">
-                <div className="flex items-center gap-1">
-                  <span className="text-xs font-semibold leading-none">
-                    {LANE_LABELS[laneId]}
-                  </span>
+            <div key={laneId} className="flex-1 rounded-lg">
+              <button
+                onClick={() => onSelectLane(laneId)}
+                className={cn(
+                  "flex flex-row items-stretch rounded-lg border-2 text-left transition-colors w-full h-full overflow-hidden p-0",
+                  selected
+                    ? "border-primary bg-primary/10"
+                    : critical
+                    ? "border-destructive/60 bg-destructive/5"
+                    : "border-border bg-card hover:border-primary/40",
+                )}
+              >
+                {/* Left: info panel */}
+                <div className="shrink-0 w-[40%] flex flex-col justify-center p-2 gap-2">
+                  <div className="flex items-center justify-between gap-1 flex-wrap">
+                    <span className="text-xs font-semibold leading-none">
+                      {LANE_LABELS[laneId]}
+                    </span>
+                    {role === "artillery" && personnel && (
+                      <ArtilleryStatusTags lane={lane} personnel={personnel} />
+                    )}
+                  </div>
+                  {role === "builder" && <BuilderLaneInfo lane={lane} />}
+                  {role === "artillery" && personnel && (
+                    <ArtilleryLaneInfo lane={lane} />
+                  )}
+                  {role === "alchemist" && (
+                    <AlchemistLaneInfo
+                      lane={lane}
+                      enemies={enemies}
+                      radarAccuracy={radarAccuracy}
+                    />
+                  )}
                 </div>
 
-                {role === "builder" && (
-                  <BuilderLaneInfo
-                    lane={lane}
-                    laneId={laneId}
-                    builderActions={builderActions}
-                  />
-                )}
-                {role === "artillery" && personnel && (
-                  <ArtilleryLaneInfo lane={lane} personnel={personnel} />
-                )}
-                {role === "alchemist" && (
-                  <AlchemistLaneInfo
-                    lane={lane}
-                    enemies={enemies}
-                    radarAccuracy={radarAccuracy}
-                  />
-                )}
-              </div>
+                {/* Vertical divider */}
+                <div className="w-px bg-border shrink-0" />
 
-              {/* Vertical divider */}
-              <div className="w-px bg-border shrink-0" />
-
-              {/* Right: track panel */}
-              <div className="flex-1 relative overflow-hidden">
-                {/* Enemy count badge — top-left of track */}
-                {role !== "builder" && aliveCount > 0 && (
-                  <Badge
-                    variant="destructive"
-                    className="absolute top-1 left-1 z-10 text-xs px-1 py-0 h-4"
-                  >
-                    {aliveCount}
-                  </Badge>
-                )}
-
-                {role === "artillery" && personnel && (
-                  <ArtilleryTrack lane={lane} enemies={enemies} />
-                )}
-
-                {/* Builder + alchemist: subtle horizontal center line only */}
-                {(role === "builder" || role === "alchemist") && (
-                  <div className="absolute top-1/2 left-0 right-0 h-px bg-border/30" />
-                )}
-              </div>
-            </button>
+                {/* Right: track panel */}
+                <div className="flex-1 relative overflow-hidden">
+                  {role !== "builder" && aliveCount > 0 && (
+                    <Badge
+                      variant="destructive"
+                      className="absolute top-1 left-1 z-10 text-xs px-1 py-0 h-4"
+                    >
+                      {aliveCount}
+                    </Badge>
+                  )}
+                  {role === "artillery" && personnel && (
+                    <ArtilleryTrack lane={lane} enemies={enemies} />
+                  )}
+                  {(role === "builder" || role === "alchemist") && (
+                    <div className="absolute top-1/2 left-0 right-0 h-px bg-border/30" />
+                  )}
+                </div>
+              </button>
+            </div>
           );
         })}
       </div>

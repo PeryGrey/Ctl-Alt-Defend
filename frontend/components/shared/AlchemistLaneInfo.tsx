@@ -1,6 +1,6 @@
 "use client";
 import { hashEnemyReveal } from "@/lib/gameUtils";
-import { ENEMY_TYPE_ICONS } from "@/constants/gameLabels";
+import { ENEMY_TYPE_LUCIDE_ICONS } from "@/constants/gameIcons";
 import type { Lane, Enemy } from "@/engine/types";
 
 interface AlchemistLaneInfoProps {
@@ -33,12 +33,14 @@ export function AlchemistLaneInfo({
       <div className="text-sm font-bold text-destructive">
         {aliveEnemies.length}
       </div>
-      {Object.entries(typeCounts).map(([type, count]) => (
-        <div key={type} className="text-xs text-muted-foreground">
-          {ENEMY_TYPE_ICONS[type as keyof typeof ENEMY_TYPE_ICONS] ?? "?"} ×
-          {count}
-        </div>
-      ))}
+      {Object.entries(typeCounts).map(([type, count]) => {
+        const Icon = ENEMY_TYPE_LUCIDE_ICONS[type as keyof typeof ENEMY_TYPE_LUCIDE_ICONS];
+        return (
+          <div key={type} className="flex items-center gap-1 text-xs text-muted-foreground">
+            {Icon ? <Icon className="size-3" /> : "?"} ×{count}
+          </div>
+        );
+      })}
     </div>
   );
 }

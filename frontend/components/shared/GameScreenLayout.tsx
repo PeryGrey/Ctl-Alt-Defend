@@ -5,8 +5,8 @@ interface GameScreenLayoutProps {
   battlefieldView: React.ReactNode;
   header: React.ReactNode;
   actions: React.ReactNode;
-  /** When true: right panel content is scrollable (artillery/alchemist).
-   *  When false (default): right panel content is non-scrollable (builder). */
+  /** When true: right panel content is scrollable (alchemist).
+   *  When false (default): right panel content is non-scrollable (builder, artillery). */
   scrollable?: boolean;
 }
 

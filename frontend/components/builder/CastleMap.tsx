@@ -1,10 +1,10 @@
 "use client";
 import { useState, useRef } from "react";
-import { Button } from "@/_shadcn/components/ui/button";
 import { cn } from "@/_shadcn/lib/utils";
 import { GAME_CONFIG } from "@/config/gameConfig";
 import { LANE_LABELS } from "@/constants/gameLabels";
 import { useCountdown } from "@/components/shared/useCountdown";
+import { ActionButton } from "@/components/shared/ActionButton";
 import type { Lane, LaneId, BuilderAction } from "@/engine/types";
 
 interface CastleMapProps {
@@ -72,12 +72,6 @@ export function CastleMap({
     (!weaponExists && Date.now() < lastBuildCompletedAtRef.current + 1500);
   const durCritical = weaponExists && weapon.durability < 20;
 
-  const wallLabelColor = isDestructive
-    ? "text-white/70"
-    : canReinforce
-      ? "text-black/60"
-      : "text-muted-foreground";
-
   function handleReinforce() {
     onReinforce(laneId);
     setReinforcePulse(true);
@@ -97,32 +91,22 @@ export function CastleMap({
       </p>
 
       {/* Wall — always actionable */}
-      <Button
+      <ActionButton
         variant={isDestructive ? "destructive" : canReinforce ? "default" : "outline"}
+        label="Wall"
+        stat={`${Math.ceil(lane.hp)} / ${lane.maxHp}`}
+        statClassName={cn(critical && "font-bold")}
+        action={`Reinforce · ${GAME_CONFIG.builder.costs.reinforce}`}
+        disabled={!canReinforce}
+        onClick={handleReinforce}
         className={cn(
-          "flex-1 w-full h-auto rounded-lg p-3 flex-col items-start justify-between whitespace-normal",
-          !canReinforce &&
-            (critical ? "border-destructive/70" : "cursor-not-allowed"),
+          !canReinforce && critical && "border-destructive/70",
           reinforcePulse &&
             (isDestructive
               ? "ring-2 ring-offset-1 ring-white/60"
               : "ring-2 ring-offset-1 ring-primary/60"),
         )}
-        disabled={!canReinforce}
-        onClick={handleReinforce}
-      >
-        <div className="w-full flex justify-between text-xs font-medium">
-          <span className={cn("uppercase", wallLabelColor)}>Wall</span>
-          <span
-            className={cn("tabular-nums", wallLabelColor, critical && "font-bold")}
-          >
-            {Math.ceil(lane.hp)} / {lane.maxHp}
-          </span>
-        </div>
-        <span className="text-2xl font-semibold">
-          Reinforce · {GAME_CONFIG.builder.costs.reinforce}
-        </span>
-      </Button>
+      />
 
       {/* Weapon — three states */}
       {showBuilding ? (
@@ -144,34 +128,15 @@ export function CastleMap({
           <span className="text-2xl text-muted-foreground">Operational</span>
         </div>
       ) : (
-        <Button
+        <ActionButton
           variant={canBuild ? "default" : "outline"}
-          className={cn(
-            "flex-1 w-full h-auto rounded-lg p-3 flex-col items-start justify-between whitespace-normal disabled:cursor-not-allowed",
-            buildPulse && "ring-2 ring-offset-1 ring-primary/60",
-          )}
+          label="Weapon"
+          stat="—"
+          action={`Build · ${GAME_CONFIG.builder.costs.build}`}
           disabled={!canBuild}
           onClick={handleBuild}
-        >
-          <div className="flex justify-between w-full text-xs font-medium uppercase">
-            <span
-              className={cn(
-                "uppercase",
-                canBuild ? "text-black/60" : "text-muted-foreground",
-              )}
-            >
-              Weapon
-            </span>
-            <span
-              className={canBuild ? "text-black/60" : "text-muted-foreground"}
-            >
-              —
-            </span>
-          </div>
-          <span className="text-2xl font-semibold">
-            Build · {GAME_CONFIG.builder.costs.build}
-          </span>
-        </Button>
+          className={cn(buildPulse && "ring-2 ring-offset-1 ring-primary/60")}
+        />
       )}
     </div>
   );

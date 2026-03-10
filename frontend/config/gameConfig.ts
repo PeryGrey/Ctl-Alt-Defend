@@ -46,9 +46,9 @@ export const GAME_CONFIG = {
   alchemist: {
     brewSlots: 3,
     brewTimePerAmmoType: {
-      cannonballs: 8, // seconds
-      arrows: 6,
-      bolts: 7,
+      sea: 8, // seconds
+      land: 6,
+      air: 7,
     },
     radarAccuracy: {
       initial: 0, // 0% at start of game
@@ -60,7 +60,7 @@ export const GAME_CONFIG = {
   enemies: {
     baseHp: 50,
     baseDamagePerHit: 10, // damage dealt to wall per hit
-    baseSpeedPxPerSecond: 150,
+    baseSpeedPxPerSecond: 1,
     spawnStaggerMin: 10, // min position units between consecutive enemies in the same lane
     spawnStaggerMax: 20, // max position units between consecutive enemies in the same lane
   },
@@ -127,4 +127,4 @@ export const GAME_CONFIG = {
     penaltyPerWeaponDestroyed: 20,
     penaltyPerNarrowBreach: 5,
   },
-} as const
+} as const;

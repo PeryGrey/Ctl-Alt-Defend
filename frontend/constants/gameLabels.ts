@@ -1,10 +1,5 @@
 import type { LaneId, EnemyType, AmmoType, Role } from "@/engine/types";
 
-export const AMMO_ICONS: Record<AmmoType, string> = {
-  cannonballs: "🔮",
-  arrows: "🏹",
-  bolts: "⚡",
-};
 
 export const LANE_LABELS: Record<LaneId, string> = {
   moat_left: "Left Moat",
@@ -33,19 +28,14 @@ export const ENEMY_TYPE_LABELS: Record<EnemyType, string> = {
   air: "Air",
 };
 
-export const ENEMY_TYPE_ICONS: Record<EnemyType, string> = {
-  sea: "🌊",
-  land: "🏃",
-  air: "🦅",
-};
 
 export const AMMO_LABELS: Record<AmmoType, string> = {
-  cannonballs: "Cannonballs",
-  arrows: "Arrows",
-  bolts: "Bolts",
+  sea: "Sea",
+  land: "Land",
+  air: "Air",
 };
 
-export const AMMO_TYPES: AmmoType[] = ["cannonballs", "arrows", "bolts"];
+export const AMMO_TYPES: AmmoType[] = ["sea", "land", "air"];
 
 export const ROLE_META: Record<
   Role,
