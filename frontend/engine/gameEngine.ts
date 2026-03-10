@@ -136,19 +136,14 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
         state.waveStartedAt = Date.now()
         state.nextWaveAt = null
         state.enemiesDefeated = 0
-        if (isBuilder && !replaying) {
-          // Builder generates and publishes spawns; non-builders wait for enemy_spawn
-          // During replay, enemies are restored from the enemy_spawn event instead
-          const enemies = generateWaveEnemies(wave)
-          state.enemies = enemies
-          publish('enemy_spawn', { enemies: enemies as unknown as Record<string, unknown>[] })
-        }
+        // enemy_spawn is published directly alongside wave_start at the call site,
+        // not here — avoids depending on the Realtime round-trip being established.
         break
       }
 
       case 'enemy_spawn': {
         // Non-builders always load from the event; builder only loads during replay
-        // (in live play the builder already set enemies locally in wave_start)
+        // (in live play the builder already set enemies locally at publish time)
         if (!isBuilder || replaying) {
           state.enemies = (p['enemies'] as Enemy[]) ?? []
         }
@@ -297,13 +292,17 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
 
         if (isBuilder && !replaying) {
           if (waveBreatherTimeout) clearTimeout(waveBreatherTimeout)
-          waveBreatherTimeout = setTimeout(() => {
+          waveBreatherTimeout = setTimeout(async () => {
             const lastWave = GAME_CONFIG.waves[GAME_CONFIG.waves.length - 1].wave
             if (wave >= lastWave) {
               const finalScore = calculateScore(state)
               publish('game_over', { reason: 'victory', finalScore })
             } else {
-              publish('wave_start', { wave: wave + 1 })
+              const nextWave = wave + 1
+              await publish('wave_start', { wave: nextWave })
+              const enemies = generateWaveEnemies(nextWave)
+              state.enemies = enemies
+              publish('enemy_spawn', { enemies: enemies as unknown as Record<string, unknown>[] })
             }
           }, GAME_CONFIG.betweenWaveBreatherSeconds * 1000)
         }
@@ -634,9 +633,17 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
 
         tickInterval = setInterval(tick, 1000)
 
-        // Only publish wave_start on a brand-new game (no session events found)
+        // Only publish wave_start on a brand-new game (no session events found).
+        // enemy_spawn is published here too — not via Realtime round-trip — because
+        // the channel may not be connected yet when wave_start fires.
         if (isBuilder && sessionEvents.length === 0) {
-          setTimeout(() => publish('wave_start', { wave: 1 }), 500)
+          setTimeout(async () => {
+            const wave = 1
+            await publish('wave_start', { wave })
+            const enemies = generateWaveEnemies(wave)
+            state.enemies = enemies
+            publish('enemy_spawn', { enemies: enemies as unknown as Record<string, unknown>[] })
+          }, 500)
         }
 
         emit()
