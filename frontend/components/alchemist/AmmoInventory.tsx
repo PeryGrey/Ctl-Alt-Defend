@@ -20,16 +20,19 @@ interface AmmoInventoryProps {
   onSelect?: (ammoType: AmmoType) => void;
   /** Highlights the currently loaded ammo type when onSelect is provided. */
   loadedAmmo?: AmmoType | null;
+  /** When true, unloaded buttons with stock pulse to prompt the user to load ammo. */
+  isPulse?: boolean;
 }
 
 export function AmmoInventory({
   inventory,
   onSelect,
   loadedAmmo,
+  isPulse,
 }: AmmoInventoryProps) {
   if (onSelect) {
     return (
-      <div className="flex gap-1.5">
+      <div className={cn("flex gap-1.5", isPulse && "animate-pulse")}>
         {AMMO_TYPES.map((type) => {
           const Icon = ENEMY_TYPE_LUCIDE_ICONS[type];
           const isLoaded = loadedAmmo === type;
@@ -44,7 +47,7 @@ export function AmmoInventory({
                 isLoaded
                   ? AMMO_SELECTED_STYLE[type]
                   : "border-white/15 text-white/50 hover:border-white/30 hover:text-white/70",
-                count <= 0 && "cursor-not-allowed",
+                count <= 0 && "cursor-not-allowed animate-none",
               )}
               disabled={!isLoaded && count <= 0}
               onClick={() => {

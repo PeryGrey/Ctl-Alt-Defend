@@ -25,7 +25,7 @@ export function ArtilleryLaneInfo({ lane }: ArtilleryLaneInfoProps) {
           barClass={getHealthColorClass(durPct)}
         />
       ) : (
-        <div className="text-xs text-muted-foreground">No weapon</div>
+        <div className="text-xs text-muted-foreground italic">No weapon</div>
       )}
     </div>
   );

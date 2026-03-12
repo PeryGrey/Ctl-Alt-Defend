@@ -19,7 +19,10 @@ interface CastleMapProps {
 function useBuildProgress(completesAt: number) {
   const totalSecs = GAME_CONFIG.builder.timers.build;
   const secs = useCountdown(completesAt);
-  const pct = Math.min(100, Math.max(0, ((totalSecs - secs) / totalSecs) * 100));
+  const pct = Math.min(
+    100,
+    Math.max(0, ((totalSecs - secs) / totalSecs) * 100),
+  );
   return { secs, pct };
 }
 
@@ -92,7 +95,9 @@ export function CastleMap({
 
       {/* Wall — always actionable */}
       <ActionButton
-        variant={isDestructive ? "destructive" : canReinforce ? "default" : "outline"}
+        variant={
+          isDestructive ? "destructive" : canReinforce ? "default" : "outline"
+        }
         label="Wall"
         stat={`${Math.ceil(lane.hp)} / ${lane.maxHp}`}
         statClassName={cn(critical && "font-bold")}
@@ -114,7 +119,7 @@ export function CastleMap({
       ) : weaponExists ? (
         <div className="flex-1 w-full rounded-lg border p-3 flex flex-col justify-between">
           <div className="flex justify-between text-xs text-muted-foreground uppercase">
-            <span className="uppercase">Weapon</span>
+            <span className="uppercase">Gun</span>
             <span
               className={cn(
                 "tabular-nums",
@@ -130,7 +135,7 @@ export function CastleMap({
       ) : (
         <ActionButton
           variant={canBuild ? "default" : "outline"}
-          label="Weapon"
+          label="Gun"
           stat="—"
           action={`Build · ${GAME_CONFIG.builder.costs.build}`}
           disabled={!canBuild}

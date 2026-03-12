@@ -70,6 +70,7 @@ export function ArtilleryLanePanel({
             inventory={ammoInventory}
             loadedAmmo={weapon.ammoLoaded}
             onSelect={onLoadAmmo}
+            isPulse={!!firer && weapon.ammoLoaded === null}
           />
         </div>
       )}

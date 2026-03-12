@@ -21,14 +21,14 @@ export function StatRow({
 }: StatRowProps) {
   return (
     <div className="flex items-center gap-1.5 text-xs">
-      <span className="text-muted-foreground shrink-0 w-8">{label}</span>
+      <span className="text-muted-foreground shrink-0">{label}</span>
       <Progress
         value={empty ? 0 : value}
         className={cn("flex-1 h-1.5", barClass)}
       />
       <span
         className={cn(
-          "tabular-nums shrink-0 w-7 text-right text-muted-foreground",
+          "tabular-nums shrink-0 w-6 text-right text-muted-foreground",
           valueCritical && "text-destructive font-bold",
         )}
       >
