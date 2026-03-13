@@ -105,7 +105,7 @@ export function BrewPanel({
   return (
     <div className="space-y-3">
       <SectionLabel>Brew Slots</SectionLabel>
-      <div className="h-18.5 grid grid-cols-3 gap-2">
+      <div className="h-18.5 grid grid-cols-3 gap-2" data-tutorial-id="alchemist-brew-slots">
         {brewSlots.map((slot) =>
           slot.completesAt !== null && slot.ammoType !== null ? (
             <ActiveBrewSlot
@@ -121,7 +121,7 @@ export function BrewPanel({
       </div>
 
       <SectionLabel>Brew</SectionLabel>
-      <div className="flex gap-2">
+      <div className="flex gap-2" data-tutorial-id="alchemist-brew-buttons">
         {AMMO_TYPES.map((ammoType) => (
           <BrewButton
             key={ammoType}

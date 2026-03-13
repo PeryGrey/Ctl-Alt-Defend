@@ -94,24 +94,26 @@ export function CastleMap({
       </p>
 
       {/* Wall — always actionable */}
-      <ActionButton
-        variant={
-          isDestructive ? "destructive" : canReinforce ? "default" : "outline"
-        }
-        label="Wall"
-        stat={`${Math.ceil(lane.hp)} / ${lane.maxHp}`}
-        statClassName={cn(critical && "font-bold")}
-        action={`Reinforce · ${GAME_CONFIG.builder.costs.reinforce}`}
-        disabled={!canReinforce}
-        onClick={handleReinforce}
-        className={cn(
-          !canReinforce && critical && "border-destructive/70",
-          reinforcePulse &&
-            (isDestructive
-              ? "ring-2 ring-offset-1 ring-white/60"
-              : "ring-2 ring-offset-1 ring-primary/60"),
-        )}
-      />
+      <div data-tutorial-id="builder-reinforce-button" className="flex-1 flex flex-col">
+        <ActionButton
+          variant={
+            isDestructive ? "destructive" : canReinforce ? "default" : "outline"
+          }
+          label="Wall"
+          stat={`${Math.ceil(lane.hp)} / ${lane.maxHp}`}
+          statClassName={cn(critical && "font-bold")}
+          action={`Reinforce · ${GAME_CONFIG.builder.costs.reinforce}`}
+          disabled={!canReinforce}
+          onClick={handleReinforce}
+          className={cn(
+            !canReinforce && critical && "border-destructive/70",
+            reinforcePulse &&
+              (isDestructive
+                ? "ring-2 ring-offset-1 ring-white/60"
+                : "ring-2 ring-offset-1 ring-primary/60"),
+          )}
+        />
+      </div>
 
       {/* Weapon — three states */}
       {showBuilding ? (
@@ -133,15 +135,17 @@ export function CastleMap({
           <span className="text-2xl text-muted-foreground">Operational</span>
         </div>
       ) : (
-        <ActionButton
-          variant={canBuild ? "default" : "outline"}
-          label="Gun"
-          stat="—"
-          action={`Build · ${GAME_CONFIG.builder.costs.build}`}
-          disabled={!canBuild}
-          onClick={handleBuild}
-          className={cn(buildPulse && "ring-2 ring-offset-1 ring-primary/60")}
-        />
+        <div data-tutorial-id="builder-build-button" className="flex-1 flex flex-col">
+          <ActionButton
+            variant={canBuild ? "default" : "outline"}
+            label="Gun"
+            stat="—"
+            action={`Build · ${GAME_CONFIG.builder.costs.build}`}
+            disabled={!canBuild}
+            onClick={handleBuild}
+            className={cn(buildPulse && "ring-2 ring-offset-1 ring-primary/60")}
+          />
+        </div>
       )}
     </div>
   );

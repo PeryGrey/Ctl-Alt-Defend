@@ -2,7 +2,7 @@ import { RealtimeChannel } from '@supabase/supabase-js'
 import { supabase } from './supabase'
 
 export type GameEventType =
-  | 'player_join'
+  | 'player_join' | 'player_ready'
   | 'brew_start' | 'brew_complete' | 'ammo_dispatch'
   | 'build_start' | 'build_complete' | 'upgrade' | 'reposition' | 'reinforce'
   | 'weapon_fire' | 'weapon_assign' | 'weapon_repair' | 'weapon_durability'

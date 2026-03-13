@@ -32,7 +32,10 @@ export function AmmoInventory({
 }: AmmoInventoryProps) {
   if (onSelect) {
     return (
-      <div className={cn("flex gap-1.5", isPulse && "animate-pulse")}>
+      <div
+        className={cn("flex gap-1.5", isPulse && "animate-pulse")}
+        data-tutorial-id="artillery-load-ammo"
+      >
         {AMMO_TYPES.map((type) => {
           const Icon = ENEMY_TYPE_LUCIDE_ICONS[type];
           const isLoaded = loadedAmmo === type;

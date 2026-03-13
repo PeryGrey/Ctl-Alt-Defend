@@ -87,14 +87,16 @@ export function ArtilleryLanePanel({
               onClick={onUnmanWeapon}
             />
           ) : (
-            <ActionButton
-              variant={hasIdle ? "default" : "outline"}
-              label="Gunner"
-              stat="—"
-              action="Open Fire"
-              disabled={!hasIdle}
-              onClick={onManWeapon}
-            />
+            <div data-tutorial-id="artillery-man-button" className="flex-1 flex flex-col">
+              <ActionButton
+                variant={hasIdle ? "default" : "outline"}
+                label="Gunner"
+                stat="—"
+                action="Open Fire"
+                disabled={!hasIdle}
+                onClick={onManWeapon}
+              />
+            </div>
           )}
 
           {maintainer ? (
@@ -106,15 +108,17 @@ export function ArtilleryLanePanel({
               onClick={onStopMaintenance}
             />
           ) : (
-            <ActionButton
-              variant={hasIdle ? "blue" : "outline"}
-              label="Durability"
-              stat={durStat}
-              statClassName={cn(durCritical && "text-destructive font-bold")}
-              action="Repair"
-              disabled={!hasIdle}
-              onClick={onMaintainWeapon}
-            />
+            <div data-tutorial-id="artillery-maintain-button" className="flex-1 flex flex-col">
+              <ActionButton
+                variant={hasIdle ? "blue" : "outline"}
+                label="Durability"
+                stat={durStat}
+                statClassName={cn(durCritical && "text-destructive font-bold")}
+                action="Repair"
+                disabled={!hasIdle}
+                onClick={onMaintainWeapon}
+              />
+            </div>
           )}
         </div>
       )}

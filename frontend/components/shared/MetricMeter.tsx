@@ -19,7 +19,7 @@ export function MetricMeter({
   const pct = Math.min(100, (value / maxValue) * 100);
 
   return (
-    <div className="space-y-1 pb-2">
+    <div className="space-y-1 pb-2" data-tutorial-id="resource-meter">
       <div className="flex items-baseline justify-between">
         <span className="text-xs font-medium text-muted-foreground uppercase tracking-wide">
           {label}

@@ -19,7 +19,10 @@ export default function LobbyPage() {
   const router = useRouter();
 
   const myRole = searchParams.get("role") as Role | null;
+
   const [realtimeJoined, setRealtimeJoined] = useState<Set<Role>>(new Set());
+  const [realtimeReady, setRealtimeReady] = useState<Set<Role>>(new Set());
+  const [redirectedToTutorial, setRedirectedToTutorial] = useState(false);
 
   const { data: lobbyData } = useQuery({
     queryKey: ["lobby", roomCode],
@@ -32,15 +35,25 @@ export default function LobbyPage() {
           .single(),
         supabase
           .from("game_events")
-          .select("payload")
+          .select("type, payload")
           .eq("room_code", roomCode)
-          .eq("type", "player_join"),
+          .in("type", ["player_join", "player_ready"]),
       ]);
+
+      const events = eventsRes.data ?? [];
+      const joinedRoles = events
+        .filter((e) => e.type === "player_join")
+        .map((e) => (e.payload as { role?: string } | null)?.role)
+        .filter((r): r is Role => ALL_ROLES.includes(r as Role));
+      const readyRoles = events
+        .filter((e) => e.type === "player_ready")
+        .map((e) => (e.payload as { role?: string } | null)?.role)
+        .filter((r): r is Role => ALL_ROLES.includes(r as Role));
+
       return {
         teamName: sessionRes.data?.team_name ?? "",
-        joinedRoles: (eventsRes.data ?? [])
-          .map((e) => (e.payload as { role?: string } | null)?.role)
-          .filter((r): r is Role => ALL_ROLES.includes(r as Role)),
+        joinedRoles,
+        readyRoles,
       };
     },
   });
@@ -50,12 +63,31 @@ export default function LobbyPage() {
     [lobbyData?.joinedRoles, realtimeJoined],
   );
 
+  const ready = useMemo(
+    () => new Set([...(lobbyData?.readyRoles ?? []), ...realtimeReady]),
+    [lobbyData?.readyRoles, realtimeReady],
+  );
+
+  // Redirect current player to tutorial once on join
+  useEffect(() => {
+    if (myRole && joined.has(myRole) && !ready.has(myRole) && !redirectedToTutorial) {
+      setRedirectedToTutorial(true);
+      router.push(`/tutorial/${roomCode}/${myRole}`);
+    }
+  }, [myRole, joined, ready, redirectedToTutorial, roomCode, router]);
+
   useEffect(() => {
     const unsub = subscribeToRoom(roomCode, (event: GameEvent) => {
       if (event.type === "player_join") {
         const role = (event.payload as { role?: string } | null)?.role;
         if (role && ALL_ROLES.includes(role as Role)) {
           setRealtimeJoined((prev) => new Set([...prev, role as Role]));
+        }
+      }
+      if (event.type === "player_ready") {
+        const role = (event.payload as { role?: string } | null)?.role;
+        if (role && ALL_ROLES.includes(role as Role)) {
+          setRealtimeReady((prev) => new Set([...prev, role as Role]));
         }
       }
       if (event.type === "wave_start") {
@@ -78,7 +110,7 @@ export default function LobbyPage() {
     },
   });
 
-  const allReady = joined.size === 3;
+  const allReady = ready.size === 3;
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
@@ -102,6 +134,7 @@ export default function LobbyPage() {
             const meta = ROLE_META[r];
             const isMe = r === myRole;
             const present = joined.has(r);
+            const isReady = ready.has(r);
             return (
               <Card key={r}>
                 <CardContent className="flex items-center gap-3 py-3">
@@ -114,9 +147,13 @@ export default function LobbyPage() {
                       </Badge>
                     )}
                   </div>
-                  <Badge variant={present ? "default" : "outline"}>
-                    {present ? "Ready" : "Waiting…"}
-                  </Badge>
+                  {isReady ? (
+                    <Badge variant="default">Ready ✓</Badge>
+                  ) : present ? (
+                    <Badge variant="outline">In tutorial…</Badge>
+                  ) : (
+                    <Badge variant="outline">Waiting…</Badge>
+                  )}
                 </CardContent>
               </Card>
             );
@@ -125,7 +162,9 @@ export default function LobbyPage() {
 
         {!allReady && (
           <p className="text-center text-muted-foreground text-sm">
-            Share the room code with your teammates
+            {[...joined].length === 0
+              ? "Share the room code with your teammates"
+              : "Waiting for everyone to complete the tutorial"}
           </p>
         )}
 

@@ -48,7 +48,7 @@ export default function AlchemistPage() {
             </div>
             <Badge
               variant={state.radarAccuracy > 0 ? "default" : "outline"}
-              className="uppercase font-semibold text-black/60"
+              className="uppercase font-semibold"
             >
               {state.radarAccuracy}% radar
             </Badge>

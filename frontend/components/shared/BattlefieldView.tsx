@@ -81,7 +81,7 @@ export function BattlefieldView({
   personnel,
 }: BattlefieldViewProps) {
   return (
-    <div className="h-full flex flex-col p-2 gap-2">
+    <div className="h-full flex flex-col p-2 gap-2" data-tutorial-id="battlefield">
       {/* Direction hint */}
       <div className="shrink-0 flex items-center justify-end gap-1 px-1">
         <span className="text-[10px] text-muted-foreground/60 flex gap-0.5">
