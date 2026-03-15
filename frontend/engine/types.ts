@@ -80,3 +80,11 @@ export interface GameState {
   radarAccuracy: number // 0–100
   correctAmmoKills: number
 }
+
+export interface WeaponFirePayload {
+  laneId: LaneId
+  weaponId: string
+  ammoType: AmmoType
+  targetEnemyId: string
+  targetPosition: number // 0–100, matches enemy.position
+}

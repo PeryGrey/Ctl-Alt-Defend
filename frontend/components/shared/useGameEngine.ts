@@ -2,10 +2,14 @@
 import { useEffect, useState, useRef, useCallback, useMemo } from 'react'
 import { createGameEngine } from '@/engine/gameEngine'
 import { publishEvent } from '@/lib/realtime'
-import type { GameState, Role, LaneId, AmmoType } from '@/engine/types'
+import type { GameState, Role, LaneId, AmmoType, WeaponFirePayload } from '@/engine/types'
 import type { GameEngine } from '@/engine/gameEngine'
 
-export function useGameEngine(roomCode: string, role: Role) {
+export function useGameEngine(
+  roomCode: string,
+  role: Role,
+  options?: { onWeaponFire?: (payload: WeaponFirePayload) => void }
+) {
   const [state, setState] = useState<GameState | null>(null)
   const engineRef = useRef<GameEngine | null>(null)
 
@@ -15,6 +19,7 @@ export function useGameEngine(roomCode: string, role: Role) {
       role,
       publish: (type, payload) => publishEvent(roomCode, type, payload),
       onStateChange: setState,
+      onWeaponFire: options?.onWeaponFire,
     })
     engineRef.current = engine
     engine.start()

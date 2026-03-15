@@ -15,6 +15,7 @@ import type {
   LaneId,
   Personnel,
   Role,
+  WeaponFirePayload,
 } from './types'
 import { LANE_IDS } from './types'
 
@@ -83,6 +84,7 @@ interface GameEngineParams {
   role: Role
   publish: (type: GameEventType, payload: Record<string, unknown>) => Promise<void>
   onStateChange: (state: GameState) => void
+  onWeaponFire?: (payload: WeaponFirePayload) => void
 }
 
 export interface GameEngine {
@@ -103,7 +105,7 @@ export interface GameEngine {
 // ── Factory ──────────────────────────────────────────────────────────────────
 
 export function createGameEngine(params: GameEngineParams): GameEngine {
-  const { roomCode, role, publish, onStateChange } = params
+  const { roomCode, role, publish, onStateChange, onWeaponFire } = params
   const isBuilder = role === 'builder'
 
   let state = initialState(roomCode, role)
@@ -328,6 +330,19 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
         break
       }
 
+      case 'weapon_fire': {
+        if (onWeaponFire) {
+          onWeaponFire({
+            laneId: p['laneId'] as LaneId,
+            weaponId: p['weaponId'] as string,
+            ammoType: p['ammoType'] as AmmoType,
+            targetEnemyId: p['targetEnemyId'] as string,
+            targetPosition: p['targetPosition'] as number,
+          })
+        }
+        return // no state change, skip emit
+      }
+
       default:
         break
     }
@@ -439,38 +454,59 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
             weapons.damagePerShot *
             (isCorrectAmmo ? 1 : GAME_CONFIG.artillery.wrongAmmoMultiplier)
 
-          target.hp -= damage
+          const travelMs =
+            GAME_CONFIG.shots.minTravelMs +
+            ((100 - target.position) / 100) * GAME_CONFIG.shots.extraTravelMs
 
-          if (target.hp <= 0) {
-            target.alive = false
-            target.hp = 0
-            state.enemiesDefeated++
-            state.totalEnemiesDefeated++
-            if (isCorrectAmmo) state.correctAmmoKills++
-            state.score = calculateScore(state)
-            publish('enemy_defeated', {
-              enemyId: target.id,
-              ammoType: weapon.ammoLoaded,
-            })
-          }
+          // Publish weapon_fire BEFORE applying damage so animation starts first
+          publish('weapon_fire', {
+            laneId: lane.id,
+            weaponId: weapon.id,
+            ammoType: weapon.ammoLoaded,
+            targetEnemyId: target.id,
+            targetPosition: target.position,
+          })
 
-          weapon.durability = Math.max(0, weapon.durability - weapons.durabilityLossPerShot)
-          if (weapon.durability <= 0) {
-            weapon.exists = false
-            state.weaponsDestroyed++
-            state.score = calculateScore(state)
-            for (const person of state.personnel) {
-              if (person.weaponId === weapon.id) {
-                person.weaponId = null
-                person.mode = 'idle'
-                publish('weapon_assign', { personnelId: person.id, weaponId: null, mode: 'idle' })
+          // Capture references for closure — weapon/target may mutate by the time timeout fires
+          const capturedWeapon = weapon
+          const capturedTargetId = target.id
+
+          setTimeout(() => {
+            const liveTarget = state.enemies.find((e) => e.id === capturedTargetId)
+            if (liveTarget && liveTarget.alive) {
+              liveTarget.hp -= damage
+              if (liveTarget.hp <= 0) {
+                liveTarget.alive = false
+                liveTarget.hp = 0
+                state.enemiesDefeated++
+                state.totalEnemiesDefeated++
+                if (isCorrectAmmo) state.correctAmmoKills++
+                state.score = calculateScore(state)
+                publish('enemy_defeated', {
+                  enemyId: capturedTargetId,
+                  ammoType: capturedWeapon.ammoLoaded,
+                })
               }
             }
-          }
-          publish('weapon_durability', {
-            weaponId: weapon.id, laneId: weapon.laneId, slot: weapon.slot,
-            durability: weapon.durability, exists: weapon.exists,
-          })
+
+            capturedWeapon.durability = Math.max(0, capturedWeapon.durability - weapons.durabilityLossPerShot)
+            if (capturedWeapon.durability <= 0) {
+              capturedWeapon.exists = false
+              state.weaponsDestroyed++
+              state.score = calculateScore(state)
+              for (const person of state.personnel) {
+                if (person.weaponId === capturedWeapon.id) {
+                  person.weaponId = null
+                  person.mode = 'idle'
+                  publish('weapon_assign', { personnelId: person.id, weaponId: null, mode: 'idle' })
+                }
+              }
+            }
+            publish('weapon_durability', {
+              weaponId: capturedWeapon.id, laneId: capturedWeapon.laneId, slot: capturedWeapon.slot,
+              durability: capturedWeapon.durability, exists: capturedWeapon.exists,
+            })
+          }, travelMs)
         }
       }
 

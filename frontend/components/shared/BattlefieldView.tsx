@@ -5,7 +5,15 @@ import { BuilderLaneInfo } from "@/components/shared/BuilderLaneInfo";
 import { ArtilleryLaneInfo } from "@/components/shared/ArtilleryLaneInfo";
 import { ArtilleryStatusTags } from "@/components/shared/ArtilleryStatusTags";
 import { AlchemistLaneInfo } from "@/components/shared/AlchemistLaneInfo";
-import type { Lane, LaneId, Enemy, Personnel, Role } from "@/engine/types";
+import type { Lane, LaneId, Enemy, Personnel, Role, AmmoType } from "@/engine/types";
+import { ShotAnimation } from "@/components/artillery/ShotAnimation";
+import { GAME_CONFIG } from "@/config/gameConfig";
+
+export interface ShotSpec {
+  id: string;
+  ammoType: AmmoType;
+  targetPosition: number;
+}
 import { LANE_IDS } from "@/engine/types";
 import { hashEnemyReveal } from "@/lib/gameUtils";
 import { ENEMY_TYPE_LUCIDE_ICONS } from "@/constants/gameIcons";
@@ -17,10 +25,14 @@ function EnemyTrack({
   lane,
   enemies,
   radarAccuracy,
+  shots,
+  onShotComplete,
 }: {
   lane: Lane;
   enemies: Enemy[];
   radarAccuracy?: number;
+  shots?: ShotSpec[];
+  onShotComplete?: (shotId: string) => void;
 }) {
   const laneEnemies = enemies.filter(
     (e) =>
@@ -33,6 +45,20 @@ function EnemyTrack({
   return (
     <div className="w-full h-full relative">
       <div className="absolute left-0 right-0 top-1/2 h-px bg-border/50" />
+      {shots?.map((shot) => {
+        const travelMs =
+          GAME_CONFIG.shots.minTravelMs +
+          ((100 - shot.targetPosition) / 100) * GAME_CONFIG.shots.extraTravelMs;
+        return (
+          <ShotAnimation
+            key={shot.id}
+            ammoType={shot.ammoType}
+            targetPosition={shot.targetPosition}
+            travelMs={travelMs}
+            onComplete={() => onShotComplete?.(shot.id)}
+          />
+        );
+      })}
       {laneEnemies.map((e) => {
         const revealed =
           radarAccuracy !== undefined
@@ -69,6 +95,8 @@ interface BattlefieldViewProps {
   selectedLaneId: LaneId | null;
   onSelectLane: (laneId: LaneId) => void;
   personnel?: [Personnel, Personnel, Personnel];
+  shotsByLane?: Record<LaneId, ShotSpec[]>;
+  onShotComplete?: (laneId: LaneId, shotId: string) => void;
 }
 
 export function BattlefieldView({
@@ -79,6 +107,8 @@ export function BattlefieldView({
   selectedLaneId,
   onSelectLane,
   personnel,
+  shotsByLane,
+  onShotComplete,
 }: BattlefieldViewProps) {
   return (
     <div className="h-full flex flex-col p-2 gap-2" data-tutorial-id="battlefield">
@@ -150,7 +180,12 @@ export function BattlefieldView({
                 {/* Right: track panel */}
                 <div className="flex-1 relative overflow-hidden">
                   {role === "artillery" && personnel && (
-                    <EnemyTrack lane={lane} enemies={enemies} />
+                    <EnemyTrack
+                      lane={lane}
+                      enemies={enemies}
+                      shots={shotsByLane?.[laneId]}
+                      onShotComplete={(shotId) => onShotComplete?.(laneId, shotId)}
+                    />
                   )}
                   {role === "alchemist" && (
                     <EnemyTrack

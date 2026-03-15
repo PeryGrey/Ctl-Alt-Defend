@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { useGameEngine } from "@/components/shared/useGameEngine";
 import { BattlefieldView } from "@/components/shared/BattlefieldView";
+import type { ShotSpec } from "@/components/shared/BattlefieldView";
 import { PhaseBadge } from "@/components/shared/PhaseBadge";
 import { GameLoadingState } from "@/components/shared/GameLoadingState";
 import { GameScreenLayout } from "@/components/shared/GameScreenLayout";
@@ -12,12 +13,46 @@ import { AmmoInventory } from "@/components/alchemist/AmmoInventory";
 import { ROLE_META } from "@/constants/gameLabels";
 import { isActiveWeapon } from "@/lib/gameUtils";
 import { PersonnelDots } from "@/components/artillery/PersonnelDots";
-import type { LaneId } from "@/engine/types";
+import type { LaneId, WeaponFirePayload } from "@/engine/types";
+import { LANE_IDS } from "@/engine/types";
 
 export default function ArtilleryPage() {
   const { roomCode } = useParams<{ roomCode: string }>();
-  const { state, actions } = useGameEngine(roomCode, "artillery");
   const [selectedLane, setSelectedLane] = useState<LaneId | null>(null);
+  const [shotsByLane, setShotsByLane] = useState<Record<LaneId, ShotSpec[]>>(
+    () =>
+      Object.fromEntries(LANE_IDS.map((id) => [id, []])) as unknown as Record<
+        LaneId,
+        ShotSpec[]
+      >,
+  );
+
+  const handleWeaponFire = useCallback((payload: WeaponFirePayload) => {
+    const shot: ShotSpec = {
+      id: `${payload.weaponId}-${Date.now()}`,
+      ammoType: payload.ammoType,
+      targetPosition: payload.targetPosition,
+    };
+    setShotsByLane((prev) => ({
+      ...prev,
+      // Replace any in-flight shot of the same ammo type — only one per type per lane at a time
+      [payload.laneId]: [
+        ...prev[payload.laneId].filter((s) => s.ammoType !== payload.ammoType),
+        shot,
+      ],
+    }));
+  }, []);
+
+  const handleShotComplete = useCallback((laneId: LaneId, shotId: string) => {
+    setShotsByLane((prev) => ({
+      ...prev,
+      [laneId]: prev[laneId].filter((s) => s.id !== shotId),
+    }));
+  }, []);
+
+  const { state, actions } = useGameEngine(roomCode, "artillery", {
+    onWeaponFire: handleWeaponFire,
+  });
 
   useGameOverRedirect(state?.phase, roomCode);
 
@@ -75,6 +110,8 @@ export default function ArtilleryPage() {
           selectedLaneId={selectedLane}
           onSelectLane={setSelectedLane}
           personnel={state.personnel}
+          shotsByLane={shotsByLane}
+          onShotComplete={handleShotComplete}
         />
       }
       header={
@@ -86,7 +123,9 @@ export default function ArtilleryPage() {
             <PhaseBadge phase={state.phase} nextWaveAt={state.nextWaveAt} />
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-xs text-muted-foreground">Score: {state.score}</span>
+            <span className="text-xs text-muted-foreground">
+              Score: {state.score}
+            </span>
             <PersonnelDots personnel={state.personnel} />
           </div>
         </>
@@ -96,7 +135,9 @@ export default function ArtilleryPage() {
           <ArtilleryLanePanel
             key={selectedLane}
             ammoInventory={state.ammoInventory}
-            onLoadAmmo={(ammoType) => actions.loadAmmo(selectedWeapon!.id, ammoType)}
+            onLoadAmmo={(ammoType) =>
+              actions.loadAmmo(selectedWeapon!.id, ammoType)
+            }
             lane={selectedLaneData}
             laneId={selectedLane}
             personnel={state.personnel}

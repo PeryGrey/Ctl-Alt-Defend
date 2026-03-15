@@ -5,6 +5,12 @@ export const GAME_CONFIG = {
     wrongAmmoMultiplier: 0.2, // damage multiplier when wrong ammo is used (20% damage)
   },
 
+  // ── SHOTS ──────────────────────────────────────────────────────────────────
+  shots: {
+    minTravelMs: 150,   // minimum travel time even for very close enemies
+    extraTravelMs: 250, // additional ms for far enemies (max travel = min + extra)
+  },
+
   // ── BUILDER ────────────────────────────────────────────────────────────────
   builder: {
     resourceRegenPerSecond: 5,
