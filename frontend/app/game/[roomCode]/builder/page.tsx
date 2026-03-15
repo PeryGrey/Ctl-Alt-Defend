@@ -18,7 +18,7 @@ export default function BuilderPage() {
   const { state, actions } = useGameEngine(roomCode, "builder");
   const [selectedLane, setSelectedLane] = useState<LaneId | null>(null);
 
-  useGameOverRedirect(state?.phase, roomCode);
+  useGameOverRedirect(state?.phase, roomCode, "builder");
 
   if (!state) return <GameLoadingState />;
 

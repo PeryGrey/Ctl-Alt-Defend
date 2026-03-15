@@ -26,6 +26,7 @@ export default function LobbyPage() {
 
   const { data: lobbyData } = useQuery({
     queryKey: ["lobby", roomCode],
+    gcTime: 0,
     queryFn: async () => {
       const [sessionRes, eventsRes] = await Promise.all([
         supabase

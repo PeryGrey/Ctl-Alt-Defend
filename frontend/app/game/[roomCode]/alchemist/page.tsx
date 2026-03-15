@@ -17,7 +17,7 @@ export default function AlchemistPage() {
   const { state, actions } = useGameEngine(roomCode, "alchemist");
   const [selectedLane, setSelectedLane] = useState<LaneId | null>(null);
 
-  useGameOverRedirect(state?.phase, roomCode);
+  useGameOverRedirect(state?.phase, roomCode, "alchemist");
 
   if (!state) return <GameLoadingState />;
 

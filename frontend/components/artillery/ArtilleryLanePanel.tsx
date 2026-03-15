@@ -78,16 +78,16 @@ export function ArtilleryLanePanel({
       {/* Personnel buttons */}
       {weaponActive && (
         <div className="flex-1 flex flex-col gap-2 min-h-0">
-          {firer ? (
-            <ActionButton
-              variant="primary-ghost"
-              label="Gunner"
-              stat="firing"
-              action="Hold Fire"
-              onClick={onUnmanWeapon}
-            />
-          ) : (
-            <div data-tutorial-id="artillery-man-button" className="flex-1 flex flex-col">
+          <div data-tutorial-id="artillery-man-button" className="flex-1 flex flex-col">
+            {firer ? (
+              <ActionButton
+                variant="primary-ghost"
+                label="Gunner"
+                stat="firing"
+                action="Hold Fire"
+                onClick={onUnmanWeapon}
+              />
+            ) : (
               <ActionButton
                 variant={hasIdle ? "default" : "outline"}
                 label="Gunner"
@@ -96,19 +96,19 @@ export function ArtilleryLanePanel({
                 disabled={!hasIdle}
                 onClick={onManWeapon}
               />
-            </div>
-          )}
+            )}
+          </div>
 
-          {maintainer ? (
-            <ActionButton
-              variant="blue-ghost"
-              label="Durability"
-              stat={durStat}
-              action="Stop Repair"
-              onClick={onStopMaintenance}
-            />
-          ) : (
-            <div data-tutorial-id="artillery-maintain-button" className="flex-1 flex flex-col">
+          <div data-tutorial-id="artillery-maintain-button" className="flex-1 flex flex-col">
+            {maintainer ? (
+              <ActionButton
+                variant="blue-ghost"
+                label="Durability"
+                stat={durStat}
+                action="Stop Repair"
+                onClick={onStopMaintenance}
+              />
+            ) : (
               <ActionButton
                 variant={hasIdle ? "blue" : "outline"}
                 label="Durability"
@@ -118,8 +118,8 @@ export function ArtilleryLanePanel({
                 disabled={!hasIdle}
                 onClick={onMaintainWeapon}
               />
-            </div>
-          )}
+            )}
+          </div>
         </div>
       )}
     </div>

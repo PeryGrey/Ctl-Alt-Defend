@@ -54,7 +54,7 @@ export default function ArtilleryPage() {
     onWeaponFire: handleWeaponFire,
   });
 
-  useGameOverRedirect(state?.phase, roomCode);
+  useGameOverRedirect(state?.phase, roomCode, "artillery");
 
   if (!state) return <GameLoadingState />;
 

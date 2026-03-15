@@ -669,10 +669,12 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
 
         tickInterval = setInterval(tick, 1000)
 
-        // Only publish wave_start on a brand-new game (no session events found).
+        // Only publish wave_start on a brand-new game (no enemy_spawn event yet).
         // enemy_spawn is published here too — not via Realtime round-trip — because
         // the channel may not be connected yet when wave_start fires.
-        if (isBuilder && sessionEvents.length === 0) {
+        // Note: sessionEvents may contain wave_start (published by lobby before redirect)
+        // without a corresponding enemy_spawn, so we check for enemy_spawn specifically.
+        if (isBuilder && !sessionEvents.some((e) => e.type === 'enemy_spawn')) {
           setTimeout(async () => {
             const wave = 1
             await publish('wave_start', { wave })
