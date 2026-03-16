@@ -145,6 +145,14 @@ export default function Page() {
             >
               Join Room
             </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={() => router.push("/leaderboard")}
+              className="w-full"
+            >
+              View Leaderboard
+            </Button>
           </div>
         )}
 

@@ -4,6 +4,7 @@ import type { GameEventType } from '../lib/realtime'
 import { fetchRoomEvents, subscribeToRoom } from '../lib/realtime'
 import { generateWaveEnemies } from './enemySpawner'
 import { calculateScore } from './scoring'
+import { finalizeSession } from '../lib/gameUtils'
 import type {
   AmmoType,
   BrewSlot,
@@ -309,6 +310,10 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
         if (tickInterval) {
           clearInterval(tickInterval)
           tickInterval = null
+        }
+        if (isBuilder && !replaying) {
+          const finalScore = (p['finalScore'] as number | undefined) ?? state.score
+          finalizeSession(roomCode, finalScore, state.wavesCompleted)
         }
         break
       }

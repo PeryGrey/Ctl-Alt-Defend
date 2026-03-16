@@ -1,3 +1,4 @@
+import { supabase } from "@/lib/supabase";
 import type { Weapon } from "@/engine/types";
 
 export function getHealthColorClass(pct: number, redBelow = 30): string {
@@ -22,4 +23,15 @@ export function isActiveWeapon(
   w: Weapon | null | undefined,
 ): w is Weapon {
   return w !== null && w !== undefined && w.exists;
+}
+
+export async function finalizeSession(
+  roomCode: string,
+  score: number,
+  wavesSurvived: number,
+): Promise<void> {
+  await supabase
+    .from("game_sessions")
+    .update({ status: "complete", score, waves_survived: wavesSurvived })
+    .eq("room_code", roomCode);
 }
