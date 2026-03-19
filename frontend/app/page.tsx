@@ -18,6 +18,7 @@ import {
 import { cn } from "@/_shadcn/lib/utils";
 import { ROLE_META } from "@/constants/gameLabels";
 import type { Role } from "@/engine/types";
+import { ChevronLeft } from "lucide-react";
 
 type Mode = "home" | "create" | "join";
 
@@ -121,132 +122,133 @@ export default function Page() {
   return (
     <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
       <div className="w-full max-w-sm space-y-6">
-        <div className="text-center">
-          <h1 className="text-3xl font-bold tracking-tight">
-            🏰 Ctrl + Alt + Defend
-          </h1>
-          <p className="text-muted-foreground mt-1 text-sm">
-            Defend the castle. Don&apos;t let the walls fall.
-          </p>
-        </div>
-
         {mode === "home" && (
-          <div className="space-y-3">
-            <Button
-              onClick={() => setMode("create")}
-              className="w-full h-12 text-base"
-            >
-              Create Room
-            </Button>
-            <Button
-              variant="secondary"
-              onClick={() => setMode("join")}
-              className="w-full h-12 text-base"
-            >
-              Join Room
-            </Button>
-            <Button
-              variant="ghost"
-              size="sm"
-              onClick={() => router.push("/leaderboard")}
-              className="w-full"
-            >
-              View Leaderboard
-            </Button>
-          </div>
+          <>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold tracking-tight">
+                🏰 Ctrl + Alt + Defend
+              </h1>
+              <p className="text-muted-foreground mt-1 text-sm">
+                Defend the castle. Don&apos;t let the walls fall.
+              </p>
+            </div>
+            <div className="space-y-3">
+              <Button
+                onClick={() => setMode("create")}
+                className="w-full h-12 text-base"
+              >
+                Create Room
+              </Button>
+              <Button
+                variant="secondary"
+                onClick={() => setMode("join")}
+                className="w-full h-12 text-base"
+              >
+                Join Room
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => router.push("/leaderboard")}
+                className="w-full"
+              >
+                View Leaderboard
+              </Button>
+            </div>
+          </>
         )}
 
         {mode === "create" && (
           <div className="space-y-4">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => {
                 setMode("home");
                 reset();
               }}
+              className="mb-0 group inline-flex items-center gap-1 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-95 transition-[color,background-color,transform] duration-150 ease-out animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-fill-mode:both]"
             >
-              ← Back
-            </Button>
-            <Card>
-              <CardHeader>
-                <CardTitle>Create a Room</CardTitle>
-                <CardDescription>
-                  Your teammates will join using your room code.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="team-name">Team name</Label>
-                  <Input
-                    id="team-name"
-                    value={teamName}
-                    onChange={(e) => setTeamName(e.target.value)}
-                    placeholder="The Debugging Dragons"
-                    maxLength={30}
-                    className="h-10"
-                  />
-                </div>
+              <ChevronLeft className="w-4 h-4 transition-transform duration-150 ease-out group-hover:-translate-x-0.5" />
+              Back
+            </button>
+            <h1 className="mb-2 pl-5 text-4xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:50ms] [animation-fill-mode:both]">
+              Create a Room
+            </h1>
+            <p className="pl-5 -mt-2 text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:100ms] [animation-fill-mode:both]">
+              Your teammates will join using your room code.
+            </p>
+            <div className="space-y-4">
+              <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:150ms] [animation-fill-mode:both]">
+                <Label htmlFor="team-name">Team name</Label>
+                <Input
+                  id="team-name"
+                  value={teamName}
+                  onChange={(e) => setTeamName(e.target.value)}
+                  placeholder="The Debugging Dragons"
+                  maxLength={30}
+                  className="h-10"
+                />
+              </div>
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:200ms] [animation-fill-mode:both]">
                 <RolePicker selected={role} onSelect={setRole} />
-                {createError && (
-                  <p className="text-destructive text-sm">{createError}</p>
-                )}
-                <Button
-                  onClick={handleCreate}
-                  disabled={createRoom.isPending}
-                  className="w-full h-12 text-base"
-                >
-                  {createRoom.isPending ? "Creating…" : "Create Room"}
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+              {createError && (
+                <p className="text-destructive text-sm">{createError}</p>
+              )}
+              <Button
+                onClick={handleCreate}
+                disabled={createRoom.isPending}
+                className="w-full h-12 text-base animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:250ms] [animation-fill-mode:both]"
+              >
+                {createRoom.isPending ? "Creating…" : "Create Room"}
+              </Button>
+            </div>
           </div>
         )}
 
         {mode === "join" && (
           <div className="space-y-4">
-            <Button
-              variant="ghost"
-              size="sm"
+            <button
               onClick={() => {
                 setMode("home");
                 reset();
               }}
+              className="mb-0 group inline-flex items-center gap-1 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-95 transition-[color,background-color,transform] duration-150 ease-out animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-fill-mode:both]"
             >
-              ← Back
-            </Button>
-            <Card>
-              <CardHeader>
-                <CardTitle>Join a Room</CardTitle>
-                <CardDescription>
-                  Enter the 4-letter code from your teammate.
-                </CardDescription>
-              </CardHeader>
-              <CardContent className="space-y-4">
-                <div className="space-y-1.5">
-                  <Label htmlFor="room-code">Room code</Label>
-                  <Input
-                    id="room-code"
-                    value={roomCode}
-                    onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                    placeholder="ABCD"
-                    maxLength={4}
-                    className="h-12 text-center text-2xl font-mono tracking-widest uppercase"
-                  />
-                </div>
+              <ChevronLeft className="w-4 h-4 transition-transform duration-150 ease-out group-hover:-translate-x-0.5" />
+              Back
+            </button>
+            <h1 className="mb-2 pl-5 text-4xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:50ms] [animation-fill-mode:both]">
+              Join a Room
+            </h1>
+            <p className="pl-5 -mt-2 text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:100ms] [animation-fill-mode:both]">
+              Enter the 4-letter code from your teammate.
+            </p>
+            <div className="space-y-4">
+              <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:150ms] [animation-fill-mode:both]">
+                <Label htmlFor="room-code">Room code</Label>
+                <Input
+                  id="room-code"
+                  value={roomCode}
+                  onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                  placeholder="ABCD"
+                  maxLength={4}
+                  className="h-12 text-center text-2xl font-mono tracking-widest uppercase"
+                />
+              </div>
+              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:200ms] [animation-fill-mode:both]">
                 <RolePicker selected={role} onSelect={setRole} />
-                {joinError && (
-                  <p className="text-destructive text-sm">{joinError}</p>
-                )}
-                <Button
-                  onClick={handleJoin}
-                  disabled={joinRoom.isPending}
-                  className="w-full h-12 text-base"
-                >
-                  {joinRoom.isPending ? "Joining…" : "Join Room"}
-                </Button>
-              </CardContent>
-            </Card>
+              </div>
+              {joinError && (
+                <p className="text-destructive text-sm">{joinError}</p>
+              )}
+              <Button
+                onClick={handleJoin}
+                disabled={joinRoom.isPending}
+                className="w-full h-12 text-base animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:250ms] [animation-fill-mode:both]"
+              >
+                {joinRoom.isPending ? "Joining…" : "Join Room"}
+              </Button>
+            </div>
           </div>
         )}
       </div>

@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect } from "react";
+import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
+import { ChevronLeft } from "lucide-react";
 
 type LeaderboardRow = {
   team_name: string;
@@ -87,19 +89,23 @@ export default function LeaderboardPage() {
 
   return (
     <main className="min-h-screen flex flex-col items-center justify-start px-4 py-10">
-      <div className="w-full max-w-2xl space-y-8">
-        {/* Header */}
-        <div className="text-center space-y-1">
-          <h1 className="text-4xl font-bold tracking-tight">🏰 Leaderboard</h1>
-          <p className="text-muted-foreground text-sm">
-            Ctrl + Alt + Defend — Event Rankings
+      <div className="w-full">
+        <Link
+          href="/"
+          className="group inline-flex items-center gap-1 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-95 transition-[color,background-color,transform] duration-150 ease-out"
+        >
+          <ChevronLeft className="w-4 h-4 transition-transform duration-150 ease-out group-hover:-translate-x-0.5" />
+          Back
+        </Link>
+        <h1 className="pb-6 pl-5 text-4xl font-bold tracking-tight">
+          🏰 Leaderboard
+        </h1>
+
+        {sessionStart && (
+          <p className="text-xs text-muted-foreground text-center -mt-6">
+            Session started {new Date(sessionStart).toLocaleTimeString()}
           </p>
-          {sessionStart && (
-            <p className="text-xs text-muted-foreground">
-              Session started {new Date(sessionStart).toLocaleTimeString()}
-            </p>
-          )}
-        </div>
+        )}
 
         {/* Table */}
         {(isSessionLoading || isLeaderboardLoading) && (
@@ -131,7 +137,11 @@ export default function LeaderboardPage() {
             {leaderboard.map((row, i) => (
               <div
                 key={`${row.team_name}-${row.created_at}`}
-                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm ${
+                style={{
+                  animationDelay: `${i * 50}ms`,
+                  animationFillMode: "both",
+                }}
+                className={`flex items-center gap-3 px-4 py-3 rounded-lg text-sm animate-in fade-in slide-in-from-bottom-2 duration-300 ${
                   i === 0
                     ? "bg-yellow-500/10 border border-yellow-500/30"
                     : i === 1
