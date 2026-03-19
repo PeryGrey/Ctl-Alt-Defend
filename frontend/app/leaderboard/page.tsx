@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import Link from "next/link";
 import { useQuery, useQueryClient } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
-import { ChevronLeft } from "lucide-react";
+import { Castle, ChevronLeft } from "lucide-react";
 
 type LeaderboardRow = {
   team_name: string;
@@ -99,12 +99,6 @@ export default function LeaderboardPage() {
         </Link>
         <h1 className="pb-6 text-4xl font-bold tracking-tight">Leaderboard</h1>
 
-        {sessionStart && (
-          <p className="text-xs text-muted-foreground text-center -mt-6">
-            Session started {new Date(sessionStart).toLocaleTimeString()}
-          </p>
-        )}
-
         {/* Table */}
         {(isSessionLoading || isLeaderboardLoading) && (
           <p className="text-center text-muted-foreground">Loading…</p>
@@ -113,13 +107,57 @@ export default function LeaderboardPage() {
         {!isSessionLoading &&
           !isLeaderboardLoading &&
           leaderboard?.length === 0 && (
-            <div className="text-center text-muted-foreground py-16">
-              <p className="text-5xl mb-4">⏳</p>
-              <p className="text-lg font-medium">No games completed yet</p>
-              <p className="text-sm mt-1">
-                Rankings will appear here as teams finish.
-              </p>
-            </div>
+            <>
+              <style>{`
+                @keyframes castle-float {
+                  0%, 100% { transform: translateY(0px); }
+                  50% { transform: translateY(-7px); }
+                }
+                @keyframes ring-pulse {
+                  0% { transform: scale(1); opacity: 0.35; }
+                  100% { transform: scale(1.5); opacity: 0; }
+                }
+              `}</style>
+              <div className="flex flex-col items-center text-center py-20 animate-in fade-in slide-in-from-bottom-4 duration-500">
+                <div className="relative mb-8">
+                  <div
+                    className="w-20 h-20 rounded-2xl bg-muted/40 border border-border/60 flex items-center justify-center"
+                    style={{
+                      animation:
+                        "castle-float 4s cubic-bezier(0.45, 0, 0.55, 1) infinite",
+                    }}
+                  >
+                    <Castle className="w-9 h-9" />
+                  </div>
+                  <div
+                    className="absolute inset-0 rounded-2xl border border-muted-foreground/25"
+                    style={{
+                      animation: "ring-pulse 3s ease-out infinite",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 rounded-2xl border border-muted-foreground/15"
+                    style={{
+                      animation: "ring-pulse 3s ease-out infinite 0.8s",
+                    }}
+                  />
+                </div>
+
+                <p
+                  className="text-lg font-semibold tracking-tight mb-2 animate-in fade-in slide-in-from-bottom-2 duration-300"
+                  style={{ animationDelay: "150ms", animationFillMode: "both" }}
+                >
+                  No games completed yet
+                </p>
+                <p
+                  className="text-sm text-muted-foreground max-w-[220px] leading-relaxed animate-in fade-in slide-in-from-bottom-2 duration-300"
+                  style={{ animationDelay: "250ms", animationFillMode: "both" }}
+                >
+                  Rankings will appear once teams finish defending their
+                  castles.
+                </p>
+              </div>
+            </>
           )}
 
         {leaderboard && leaderboard.length > 0 && (
