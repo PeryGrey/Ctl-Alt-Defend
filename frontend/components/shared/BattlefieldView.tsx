@@ -5,7 +5,14 @@ import { BuilderLaneInfo } from "@/components/shared/BuilderLaneInfo";
 import { ArtilleryLaneInfo } from "@/components/shared/ArtilleryLaneInfo";
 import { ArtilleryStatusTags } from "@/components/shared/ArtilleryStatusTags";
 import { AlchemistLaneInfo } from "@/components/shared/AlchemistLaneInfo";
-import type { Lane, LaneId, Enemy, Personnel, Role, AmmoType } from "@/engine/types";
+import type {
+  Lane,
+  LaneId,
+  Enemy,
+  Personnel,
+  Role,
+  AmmoType,
+} from "@/engine/types";
 import { ShotAnimation } from "@/components/artillery/ShotAnimation";
 import { GAME_CONFIG } from "@/config/gameConfig";
 
@@ -59,28 +66,54 @@ function EnemyTrack({
           />
         );
       })}
-      {laneEnemies.map((e) => {
-        const revealed =
-          radarAccuracy !== undefined
-            ? hashEnemyReveal(e.id, radarAccuracy)
-            : true;
-        const Icon = revealed ? ENEMY_TYPE_LUCIDE_ICONS[e.type] : null;
-        return (
-          <span
-            key={e.id}
-            className="absolute top-1/2 -translate-y-1/2 text-sm leading-none"
-            style={{ right: `${e.position}%` }}
-          >
-            {radarAccuracy === undefined ? (
-              <HatGlasses className="size-5 text-destructive" />
-            ) : Icon ? (
-              <Icon className="size-5 text-destructive" />
-            ) : (
-              <span className="text-xl text-muted-foreground font-bold">?</span>
-            )}
-          </span>
-        );
-      })}
+      {laneEnemies
+        .slice()
+        .sort((a, b) => a.position - b.position)
+        .reduce<Enemy[][]>((clusters, e) => {
+          const last = clusters[clusters.length - 1];
+          if (last && Math.abs(e.position - last[0].position) <= 5) {
+            last.push(e);
+          } else {
+            clusters.push([e]);
+          }
+          return clusters;
+        }, [])
+        .map((group) => {
+          const rep = group[group.length - 1];
+          const count = group.length;
+          const revealed =
+            radarAccuracy !== undefined
+              ? hashEnemyReveal(rep.id, radarAccuracy)
+              : true;
+          const Icon = revealed ? ENEMY_TYPE_LUCIDE_ICONS[rep.type] : null;
+          return (
+            <span
+              key={rep.id}
+              className="absolute top-1/2 -translate-y-1/2 text-sm leading-none"
+              style={{
+                left: `${100 - rep.position}%`,
+                transition: "left 1s linear",
+              }}
+            >
+              <span className="relative inline-flex">
+                {radarAccuracy === undefined ? (
+                  <HatGlasses className="size-5 text-destructive" />
+                ) : Icon ? (
+                  <Icon className="size-5 text-destructive" />
+                ) : (
+                  <span className="text-xl text-muted-foreground font-bold">
+                    ?
+                  </span>
+                )}
+                {count > 1 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-3.5 h-3.5 rounded-full bg-destructive text-[9px] font-bold text-white flex items-center justify-center px-0.5 leading-none">
+                    {count}
+                  </span>
+                )}
+              </span>
+            </span>
+          );
+        })}
     </div>
   );
 }
@@ -111,7 +144,10 @@ export function BattlefieldView({
   onShotComplete,
 }: BattlefieldViewProps) {
   return (
-    <div className="h-full flex flex-col p-2 gap-2" data-tutorial-id="battlefield">
+    <div
+      className="h-full flex flex-col p-2 gap-2"
+      data-tutorial-id="battlefield"
+    >
       {/* Direction hint */}
       <div className="shrink-0 flex items-center justify-end gap-1 px-1">
         <span className="text-[10px] text-muted-foreground/60 flex gap-0.5">
@@ -184,7 +220,9 @@ export function BattlefieldView({
                       lane={lane}
                       enemies={enemies}
                       shots={shotsByLane?.[laneId]}
-                      onShotComplete={(shotId) => onShotComplete?.(laneId, shotId)}
+                      onShotComplete={(shotId) =>
+                        onShotComplete?.(laneId, shotId)
+                      }
                     />
                   )}
                   {role === "alchemist" && (
