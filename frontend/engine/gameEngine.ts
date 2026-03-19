@@ -114,6 +114,7 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
   let unsubscribe: (() => void) | null = null
   let waveBreatherTimeout: ReturnType<typeof setTimeout> | null = null
   let replaying = false
+  let stopped = false
 
   function emit() {
     onStateChange({ ...state })
@@ -606,6 +607,7 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
     // Replay historical events then start ticking
     fetchRoomEvents(roomCode)
       .then((events) => {
+        if (stopped) return
         // Scope replay to the most recent game session: find the last wave_start(wave=1)
         // and discard all events before it, so stale events from previous sessions are ignored.
         const lastSessionStart = [...events].reverse().findIndex(
@@ -692,6 +694,7 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
         emit()
       })
       .catch(() => {
+        if (stopped) return
         // Fallback: start fresh if history fetch fails
         tickInterval = setInterval(tick, 1000)
         if (isBuilder) setTimeout(() => publish('wave_start', { wave: 1 }), 500)
@@ -700,6 +703,7 @@ export function createGameEngine(params: GameEngineParams): GameEngine {
   }
 
   function stop() {
+    stopped = true
     if (tickInterval) {
       clearInterval(tickInterval)
       tickInterval = null
