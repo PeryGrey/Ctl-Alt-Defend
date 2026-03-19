@@ -199,7 +199,7 @@ export default function RevealPage() {
 
       {/* Stage 3: Leaderboard */}
       {stage === 3 && (
-        <div className="flex flex-col items-center gap-6 w-full max-w-sm animate-in fade-in duration-700">
+        <div className="flex flex-col items-center gap-4 w-full max-w-sm animate-in fade-in duration-700">
           <div className="text-center">
             <p className="text-muted-foreground text-xs uppercase tracking-widest">
               Leaderboard
@@ -207,7 +207,25 @@ export default function RevealPage() {
             <h2 className="text-2xl font-bold mt-1">Event Rankings</h2>
           </div>
           <div className="w-full space-y-1">
-            {leaderboard?.map((row, i) => {
+            {leaderboard && leaderboard.length > 0 && (
+              <div className="flex items-center gap-3 px-3 pb-1 text-xs text-muted-foreground uppercase tracking-widest">
+                <span className="w-6" />
+                <span className="flex-1">Team</span>
+                <span>Score</span>
+                <span className="w-16 text-right">Waves</span>
+              </div>
+            )}
+            {!leaderboard && (
+              <p className="text-center text-muted-foreground text-sm">
+                Loading...
+              </p>
+            )}
+            {leaderboard?.length === 0 && (
+              <p className="text-center text-muted-foreground text-sm">
+                No results yet.
+              </p>
+            )}
+            {leaderboard?.slice(0, 3).map((row, i) => {
               const isCurrentTeam = row.room_code === roomCode;
               return (
                 <div
@@ -218,26 +236,37 @@ export default function RevealPage() {
                       : "bg-muted/40"
                   }`}
                 >
-                  <span className="w-6 text-center font-mono text-xs text-muted-foreground">
+                  <span className="w-6 text-center font-mono text-xs opacity-60">
                     {i + 1}
                   </span>
                   <span className="flex-1 truncate">{row.team_name}</span>
                   <span className="font-mono font-bold">{row.score}</span>
-                  <span className="text-xs text-muted-foreground w-16 text-right">
+                  <span className="text-xs opacity-60 w-16 text-right">
                     {row.waves_survived}
                   </span>
                 </div>
               );
             })}
-            {!leaderboard && (
-              <p className="text-center text-muted-foreground text-sm">
-                Loading...
-              </p>
-            )}
-            {leaderboard?.length === 0 && (
-              <p className="text-center text-muted-foreground text-sm">
-                No results yet.
-              </p>
+            {leaderboard && currentTeamRank >= 3 && (
+              <>
+                <div className="flex items-center gap-2 py-2 px-3">
+                  <div className="flex-1 border-t border-dashed border-muted-foreground/30" />
+                </div>
+                <div className="flex items-center gap-3 px-3 py-2 rounded-md text-sm bg-primary text-primary-foreground font-semibold">
+                  <span className="w-6 text-center font-mono text-xs opacity-60">
+                    {currentTeamRank + 1}
+                  </span>
+                  <span className="flex-1 truncate">
+                    {leaderboard[currentTeamRank].team_name}
+                  </span>
+                  <span className="font-mono font-bold">
+                    {leaderboard[currentTeamRank].score}
+                  </span>
+                  <span className="text-xs opacity-60 w-16 text-right">
+                    {leaderboard[currentTeamRank].waves_survived}
+                  </span>
+                </div>
+              </>
             )}
           </div>
           {currentTeamRank >= 0 && (
