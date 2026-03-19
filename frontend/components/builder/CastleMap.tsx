@@ -29,7 +29,7 @@ function useBuildProgress(completesAt: number) {
 function BuildingCard({ completesAt }: { completesAt: number }) {
   const { secs, pct } = useBuildProgress(completesAt);
   return (
-    <div className="relative flex-1 w-full rounded-lg border p-3 flex flex-col justify-between overflow-hidden">
+    <div className="relative h-full w-full rounded-lg border p-3 flex flex-col justify-between overflow-hidden">
       <div
         className="absolute inset-0 bg-violet-500/15 transition-all"
         style={{ transform: `translateX(-${100 - pct}%)` }}
@@ -93,60 +93,68 @@ export function CastleMap({
         {LANE_LABELS[laneId]}
       </p>
 
-      {/* Wall — always actionable */}
-      <div data-tutorial-id="builder-reinforce-button" className="flex-1 flex flex-col">
-        <ActionButton
-          variant={
-            isDestructive ? "destructive" : canReinforce ? "default" : "outline"
-          }
-          label="Wall"
-          stat={`${Math.ceil(lane.hp)} / ${lane.maxHp}`}
-          statClassName={cn(critical && "font-bold")}
-          action={`Reinforce · ${GAME_CONFIG.builder.costs.reinforce}`}
-          disabled={!canReinforce}
-          onClick={handleReinforce}
-          className={cn(
-            !canReinforce && critical && "border-destructive/70",
-            reinforcePulse &&
-              (isDestructive
-                ? "ring-2 ring-offset-1 ring-white/60"
-                : "ring-2 ring-offset-1 ring-primary/60"),
-          )}
-        />
-      </div>
-
-      {/* Weapon — three states */}
-      {showBuilding ? (
-        <BuildingCard completesAt={lastBuildCompletedAtRef.current} />
-      ) : weaponExists ? (
-        <div className="flex-1 w-full rounded-lg border p-3 flex flex-col justify-between">
-          <div className="flex justify-between text-xs text-muted-foreground uppercase">
-            <span className="uppercase">Gun</span>
-            <span
-              className={cn(
-                "tabular-nums",
-                durCritical && "text-destructive font-bold",
-              )}
-            >
-              {Math.ceil(weapon.durability)} /{" "}
-              {GAME_CONFIG.weapons.startingDurability}
-            </span>
-          </div>
-          <span className="text-2xl text-muted-foreground">Operational</span>
-        </div>
-      ) : (
-        <div data-tutorial-id="builder-build-button" className="flex-1 flex flex-col">
+      <div className="flex-1 min-h-0 grid grid-rows-2 gap-2">
+        {/* Wall — always actionable */}
+        <div
+          data-tutorial-id="builder-reinforce-button"
+          className="flex flex-col"
+        >
           <ActionButton
-            variant={canBuild ? "default" : "outline"}
-            label="Gun"
-            stat="—"
-            action={`Build · ${GAME_CONFIG.builder.costs.build}`}
-            disabled={!canBuild}
-            onClick={handleBuild}
-            className={cn(buildPulse && "ring-2 ring-offset-1 ring-primary/60")}
+            variant={
+              isDestructive ? "destructive" : canReinforce ? "default" : "outline"
+            }
+            label="Wall"
+            stat={`${Math.ceil(lane.hp)} / ${lane.maxHp}`}
+            statClassName={cn(critical && "font-bold")}
+            action={`Reinforce · ${GAME_CONFIG.builder.costs.reinforce}`}
+            disabled={!canReinforce}
+            onClick={handleReinforce}
+            className={cn(
+              !canReinforce && critical && "border-destructive/70",
+              reinforcePulse &&
+                (isDestructive
+                  ? "ring-2 ring-offset-1 ring-white/60"
+                  : "ring-2 ring-offset-1 ring-primary/60"),
+            )}
           />
         </div>
-      )}
+
+        {/* Weapon — three states */}
+        {showBuilding ? (
+          <BuildingCard completesAt={lastBuildCompletedAtRef.current} />
+        ) : weaponExists ? (
+          <div className="h-full w-full rounded-lg border p-3 flex flex-col justify-between">
+            <div className="flex justify-between text-xs text-muted-foreground uppercase">
+              <span className="uppercase">Gun</span>
+              <span
+                className={cn(
+                  "tabular-nums",
+                  durCritical && "text-destructive font-bold",
+                )}
+              >
+                {Math.ceil(weapon.durability)} /{" "}
+                {GAME_CONFIG.weapons.startingDurability}
+              </span>
+            </div>
+            <span className="text-2xl text-muted-foreground">Operational</span>
+          </div>
+        ) : (
+          <div
+            data-tutorial-id="builder-build-button"
+            className="flex flex-col"
+          >
+            <ActionButton
+              variant={canBuild ? "default" : "outline"}
+              label="Gun"
+              stat="—"
+              action={`Build · ${GAME_CONFIG.builder.costs.build}`}
+              disabled={!canBuild}
+              onClick={handleBuild}
+              className={cn(buildPulse && "ring-2 ring-offset-1 ring-primary/60")}
+            />
+          </div>
+        )}
+      </div>
     </div>
   );
 }
