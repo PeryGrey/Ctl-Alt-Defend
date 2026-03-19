@@ -8,13 +8,6 @@ import { publishEvent } from "@/lib/realtime";
 import { Button } from "@/_shadcn/components/ui/button";
 import { Input } from "@/_shadcn/components/ui/input";
 import { Label } from "@/_shadcn/components/ui/label";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/_shadcn/components/ui/card";
 import { cn } from "@/_shadcn/lib/utils";
 import { ROLE_META } from "@/constants/gameLabels";
 import type { Role } from "@/engine/types";
@@ -120,8 +113,8 @@ export default function Page() {
   const joinError = validationError || joinRoom.error?.message;
 
   return (
-    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8">
-      <div className="w-full max-w-sm space-y-6">
+    <main className="min-h-screen flex flex-col items-center justify-center px-4 py-8 landscape:py-3">
+      <div className="w-full max-w-sm landscape:max-w-2xl space-y-6">
         {mode === "home" && (
           <>
             <div className="text-center">
@@ -159,95 +152,111 @@ export default function Page() {
         )}
 
         {mode === "create" && (
-          <div className="space-y-4">
+          <div>
             <button
               onClick={() => {
                 setMode("home");
                 reset();
               }}
-              className="mb-0 group inline-flex items-center gap-1 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-95 transition-[color,background-color,transform] duration-150 ease-out animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-fill-mode:both]"
+              className="group inline-flex items-center gap-1 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-95 transition-[color,background-color,transform] duration-150 ease-out animate-in fade-in slide-in-from-bottom-2 fill-mode-[both]"
             >
               <ChevronLeft className="w-4 h-4 transition-transform duration-150 ease-out group-hover:-translate-x-0.5" />
               Back
             </button>
-            <h1 className="mb-2 pl-5 text-4xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:50ms] [animation-fill-mode:both]">
-              Create a Room
-            </h1>
-            <p className="pl-5 -mt-2 text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:100ms] [animation-fill-mode:both]">
-              Your teammates will join using your room code.
-            </p>
-            <div className="space-y-4">
-              <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:150ms] [animation-fill-mode:both]">
-                <Label htmlFor="team-name">Team name</Label>
-                <Input
-                  id="team-name"
-                  value={teamName}
-                  onChange={(e) => setTeamName(e.target.value)}
-                  placeholder="The Debugging Dragons"
-                  maxLength={30}
-                  className="h-10"
-                />
+            <div className="landscape:-mt-6 landscape:grid landscape:grid-cols-2 landscape:gap-8 landscape:items-center space-y-3 landscape:space-y-0">
+              {/* Left column: title + input */}
+              <div className="space-y-3">
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:50ms] fill-mode-[both]">
+                  <h1 className="text-4xl landscape:text-2xl font-bold tracking-tight">
+                    Create a Room
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Your teammates will join using your room code.
+                  </p>
+                </div>
+                <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:150ms] fill-mode-[both]">
+                  <Label htmlFor="team-name">Team name</Label>
+                  <Input
+                    id="team-name"
+                    value={teamName}
+                    onChange={(e) => setTeamName(e.target.value)}
+                    placeholder="The Debugging Dragons"
+                    maxLength={30}
+                    className="h-10"
+                  />
+                </div>
               </div>
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:200ms] [animation-fill-mode:both]">
-                <RolePicker selected={role} onSelect={setRole} />
+              {/* Right column: role picker + submit */}
+              <div className="space-y-3">
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:200ms] fill-mode-[both]">
+                  <RolePicker selected={role} onSelect={setRole} />
+                </div>
+                {createError && (
+                  <p className="text-destructive text-sm">{createError}</p>
+                )}
+                <Button
+                  onClick={handleCreate}
+                  disabled={createRoom.isPending}
+                  className="w-full h-12 text-base animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:250ms] fill-mode-[both]"
+                >
+                  {createRoom.isPending ? "Creating…" : "Create Room"}
+                </Button>
               </div>
-              {createError && (
-                <p className="text-destructive text-sm">{createError}</p>
-              )}
-              <Button
-                onClick={handleCreate}
-                disabled={createRoom.isPending}
-                className="w-full h-12 text-base animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:250ms] [animation-fill-mode:both]"
-              >
-                {createRoom.isPending ? "Creating…" : "Create Room"}
-              </Button>
             </div>
           </div>
         )}
 
         {mode === "join" && (
-          <div className="space-y-4">
+          <div>
             <button
               onClick={() => {
                 setMode("home");
                 reset();
               }}
-              className="mb-0 group inline-flex items-center gap-1 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-95 transition-[color,background-color,transform] duration-150 ease-out animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-fill-mode:both]"
+              className="group inline-flex items-center gap-1 py-1.5 rounded-full text-sm text-muted-foreground hover:text-foreground hover:bg-muted/60 active:scale-95 transition-[color,background-color,transform] duration-150 ease-out animate-in fade-in slide-in-from-bottom-2 fill-mode-[both]"
             >
               <ChevronLeft className="w-4 h-4 transition-transform duration-150 ease-out group-hover:-translate-x-0.5" />
               Back
             </button>
-            <h1 className="mb-2 pl-5 text-4xl font-bold tracking-tight animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:50ms] [animation-fill-mode:both]">
-              Join a Room
-            </h1>
-            <p className="pl-5 -mt-2 text-sm text-muted-foreground animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:100ms] [animation-fill-mode:both]">
-              Enter the 4-letter code from your teammate.
-            </p>
-            <div className="space-y-4">
-              <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:150ms] [animation-fill-mode:both]">
-                <Label htmlFor="room-code">Room code</Label>
-                <Input
-                  id="room-code"
-                  value={roomCode}
-                  onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
-                  placeholder="ABCD"
-                  maxLength={4}
-                  className="h-12 text-center text-2xl font-mono tracking-widest uppercase"
-                />
+            <div className="landscape:-mt-6 landscape:grid landscape:grid-cols-2 landscape:gap-8 landscape:items-center space-y-3 landscape:space-y-0">
+              {/* Left column: title + input */}
+              <div className="space-y-3">
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:50ms] fill-mode-[both]">
+                  <h1 className="text-4xl landscape:text-2xl font-bold tracking-tight">
+                    Join a Room
+                  </h1>
+                  <p className="text-sm text-muted-foreground mt-1">
+                    Enter the 4-letter code from your teammate.
+                  </p>
+                </div>
+                <div className="space-y-1.5 animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:150ms] fill-mode-[both]">
+                  <Label htmlFor="room-code">Room code</Label>
+                  <Input
+                    id="room-code"
+                    value={roomCode}
+                    onChange={(e) => setRoomCode(e.target.value.toUpperCase())}
+                    placeholder="ABCD"
+                    maxLength={4}
+                    className="h-12 text-center text-2xl font-mono tracking-widest uppercase"
+                  />
+                </div>
               </div>
-              <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:200ms] [animation-fill-mode:both]">
-                <RolePicker selected={role} onSelect={setRole} />
+              {/* Right column: role picker + submit */}
+              <div className="space-y-3">
+                <div className="animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:200ms] fill-mode-[both]">
+                  <RolePicker selected={role} onSelect={setRole} />
+                </div>
+                {joinError && (
+                  <p className="text-destructive text-sm">{joinError}</p>
+                )}
+                <Button
+                  onClick={handleJoin}
+                  disabled={joinRoom.isPending}
+                  className="w-full h-12 text-base animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:250ms] fill-mode-[both]"
+                >
+                  {joinRoom.isPending ? "Joining…" : "Join Room"}
+                </Button>
               </div>
-              {joinError && (
-                <p className="text-destructive text-sm">{joinError}</p>
-              )}
-              <Button
-                onClick={handleJoin}
-                disabled={joinRoom.isPending}
-                className="w-full h-12 text-base animate-in fade-in slide-in-from-bottom-2 duration-300 [animation-delay:250ms] [animation-fill-mode:both]"
-              >
-                {joinRoom.isPending ? "Joining…" : "Join Room"}
-              </Button>
             </div>
           </div>
         )}
@@ -275,7 +284,7 @@ function RolePicker({
               type="button"
               onClick={() => onSelect(id)}
               className={cn(
-                "w-full text-left px-3 py-2.5 rounded-md border text-sm transition-colors",
+                "w-full text-left px-3 py-2.5 landscape:py-1.5 rounded-md border text-sm transition-colors",
                 selected === id
                   ? "border-primary bg-primary/10 text-foreground"
                   : "border-border bg-card text-muted-foreground hover:border-primary/50 hover:text-foreground",

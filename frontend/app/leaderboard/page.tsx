@@ -97,9 +97,7 @@ export default function LeaderboardPage() {
           <ChevronLeft className="w-4 h-4 transition-transform duration-150 ease-out group-hover:-translate-x-0.5" />
           Back
         </Link>
-        <h1 className="pb-6 pl-5 text-4xl font-bold tracking-tight">
-          🏰 Leaderboard
-        </h1>
+        <h1 className="pb-6 text-4xl font-bold tracking-tight">Leaderboard</h1>
 
         {sessionStart && (
           <p className="text-xs text-muted-foreground text-center -mt-6">
