@@ -146,18 +146,16 @@ export default function Page() {
               </Button>
               <Button
                 variant="ghost"
-                size="sm"
                 onClick={() => router.push("/leaderboard")}
-                className="w-full"
+                className="w-full h-12"
               >
                 View Leaderboard
               </Button>
               {supportsFullscreen && (
                 <Button
                   variant="ghost"
-                  size="sm"
                   onClick={() => document.documentElement.requestFullscreen()}
-                  className="w-full"
+                  className="w-full h-6"
                 >
                   <Maximize className="w-4 h-4 mr-2" />
                   Full Screen
