@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { useMutation } from "@tanstack/react-query";
 import { supabase } from "@/lib/supabase";
@@ -32,6 +32,11 @@ export default function Page() {
   const [roomCode, setRoomCode] = useState("");
   const [role, setRole] = useState<Role | null>(null);
   const [validationError, setValidationError] = useState("");
+  const [supportsFullscreen, setSupportsFullscreen] = useState(false);
+
+  useEffect(() => {
+    setSupportsFullscreen(!!document.documentElement.requestFullscreen);
+  }, []);
 
   function reset() {
     setValidationError("");
@@ -147,15 +152,17 @@ export default function Page() {
               >
                 View Leaderboard
               </Button>
-              <Button
-                variant="ghost"
-                size="sm"
-                onClick={() => document.documentElement.requestFullscreen?.()}
-                className="w-full"
-              >
-                <Maximize className="w-4 h-4 mr-2" />
-                Full Screen
-              </Button>
+              {supportsFullscreen && (
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => document.documentElement.requestFullscreen()}
+                  className="w-full"
+                >
+                  <Maximize className="w-4 h-4 mr-2" />
+                  Full Screen
+                </Button>
+              )}
             </div>
           </>
         )}
