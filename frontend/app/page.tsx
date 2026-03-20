@@ -11,7 +11,7 @@ import { Label } from "@/_shadcn/components/ui/label";
 import { cn } from "@/_shadcn/lib/utils";
 import { ROLE_META } from "@/constants/gameLabels";
 import type { Role } from "@/engine/types";
-import { ChevronLeft } from "lucide-react";
+import { ChevronLeft, Maximize } from "lucide-react";
 
 type Mode = "home" | "create" | "join";
 
@@ -146,6 +146,15 @@ export default function Page() {
                 className="w-full"
               >
                 View Leaderboard
+              </Button>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => document.documentElement.requestFullscreen?.()}
+                className="w-full"
+              >
+                <Maximize className="w-4 h-4 mr-2" />
+                Full Screen
               </Button>
             </div>
           </>
